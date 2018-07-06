@@ -7,7 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Point;
 
 use controller::Control;
-use traits::{Position, Velocity, Controllable, Render};
+use traits::{Position, Velocity, Controllable, Render, AngularVelocity, Angle};
 
 use X_LEN;
 use Y_LEN;
@@ -16,6 +16,7 @@ pub struct Ship {
     pos: (f32, f32),
     vel: (f32, f32),
     theta: f32,
+    omega: f32,
     torque: f32,
     thrust: f32,
 }
@@ -28,13 +29,14 @@ impl Ship {
             pos: (X_LEN / 2.0, Y_LEN / 2.0),
             vel: (0.0, 0.0),
             theta: PI,
-            torque: 0.01,
-            thrust: 0.0005
+            torque: 1e-5,
+            omega: 0.0,
+            thrust: 1e-4
         }
     }
 
     fn get_outline(&self) -> Vec<(f32, f32)> {
-        
+
         Ship::OUTLINE.iter().map( |(dx, dy)| {
 
             let (sin_th, cos_th) = self.theta.sin_cos();
@@ -50,39 +52,46 @@ impl Ship {
     }
 }
 
-
-impl Position for Ship {
-    fn get_xy(&self) -> (f32, f32) {
-        self.pos
-    }
-    fn get_xy_mut(&mut self) -> (&mut f32, &mut f32){
-        (&mut self.pos.0, &mut self.pos.1)
-    }
-}
+impl_Position!(Ship);
+impl_Angle!(Ship);
 
 impl Velocity for Ship {
     const WRAP_AROUND: bool = true;
-    const SPEED_DECAY: f32 = 0.99;
+    const SPEED_DECAY: f32 = 0.9;
 
-    fn get_vxy(&self) -> (f32, f32) {
+    fn get_vel(&self) -> (f32, f32) {
         self.vel
     }
-    fn get_vxy_mut(&mut self) -> (&mut f32, &mut f32){
+    fn get_vel_mut(&mut self) -> (&mut f32, &mut f32){
         (&mut self.vel.0, &mut self.vel.1)
     }
 }
 
+impl AngularVelocity for Ship {
+    const ROTATION_DECAY: f32 = 0.9;
+
+    fn get_omega(&self) -> f32 {
+        self.omega
+    }
+    fn get_omega_mut(&mut self) -> &mut f32 {
+        &mut self.omega
+    }
+}
+
+
+
 impl Controllable for Ship {
     fn control_update(&mut self, control: &Control) {
-        let rotate = control.lr as f32;
+        let rotate = control.lr as f32 * self.torque;
         let thrust = control.ud as f32;
         let (sin_th, cos_th) = self.theta.sin_cos();
         let y_acc = thrust * cos_th * self.thrust;
         let x_acc = thrust * sin_th * self.thrust;
 
-        let dt = control.elapsed_millis();
+        let dt = control.elapsed_time();
 
-        self.theta = (self.theta + rotate * dt * self.torque).mod_euc(2.0 * PI);
+        // println!("rotate {:?} dt {:?}",rotate, dt );
+        self.angular_accelerate(rotate, dt);
         self.accelerate((x_acc, y_acc), dt);
     }
 }

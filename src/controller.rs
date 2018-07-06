@@ -24,10 +24,10 @@ pub struct Control {
 }
 
 impl Control {
-    pub fn elapsed_millis(&self) -> f32 {
+    pub fn elapsed_time(&self) -> f32 {
         let e = self.update_time.elapsed();
-        let secs = e.as_secs() as f32 * 1000.0;
-        let millis = e.subsec_millis() as f32;
+        let secs = e.as_secs() as f32;
+        let millis = e.subsec_millis() as f32 / 1000.0;
         secs + millis
     }
 
@@ -120,6 +120,7 @@ impl Controller {
                 UserInput::Shoot => self.user_input.shoot = *pressed,
             }
         }
+
     }
 
     pub fn draw_background(&mut self) {

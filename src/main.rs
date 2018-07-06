@@ -7,18 +7,19 @@ use std::{thread, time};
 mod controller;
 use controller::Controller;
 
+#[macro_use]
 mod traits;
-use traits::{Render, Controllable, Velocity};
+use traits::*;
 
 mod entities;
 
-const X_LEN :f32 = 20.0;
-const Y_LEN :f32 = 20.0;
+const X_LEN :f32 = 100.0;
+const Y_LEN :f32 = 100.0;
 
 
 
-fn pause_loop(io: &mut Controller){
-
+fn pause_loop(_io: &mut Controller){
+    unimplemented!();
 }
 
 
@@ -29,17 +30,20 @@ fn main() {
 
     'game: loop {
         io.parse_events();
-        let ten_millis = time::Duration::from_millis(10);
-        thread::sleep(ten_millis);
+        let twenty_millis = time::Duration::from_millis(20);
+        thread::sleep(twenty_millis);
 
         if io.user_input.quit { break 'game }
         if io.user_input.pause { pause_loop(&mut io) }
         io.draw_background();
         ship.render(&mut io.canvas);
         ship.control_update(&io.user_input);
-        ship.move_position(io.user_input.elapsed_millis());
+        ship.move_position(io.user_input.elapsed_time());
+        ship.rotate(io.user_input.elapsed_time());
 
 
         io.canvas.present();
+        println!("lr: {:?} ud: {:?} omega: {:?} vel: {:?}",
+            io.user_input.lr, io.user_input.ud, ship.get_omega(), ship.get_vel());
     }
 }
