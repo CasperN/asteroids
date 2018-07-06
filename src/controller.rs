@@ -12,6 +12,8 @@ enum UserInput {
     Up, Down, Left, Right, Pause, Shoot, Quit
 }
 
+
+#[derive(Debug)]
 pub struct Control {
     pub ud: i8,
     pub lr: i8,
@@ -28,12 +30,26 @@ impl Control {
         let millis = e.subsec_millis() as f32;
         secs + millis
     }
+
+    fn update(&mut self, ui: &UserInput, keydown: bool ) {
+        match (ui, keydown) {
+            (UserInput::Up,    true)  | (UserInput::Down, false)  => self.ud += 1,
+            (UserInput::Up,    false) | (UserInput::Down, true)   => self.ud -= 1,
+
+            (UserInput::Right, true)  | (UserInput::Left, false)  => self.lr += 1,
+            (UserInput::Right, false) | (UserInput::Left, true)   => self.lr -= 1,
+
+            (UserInput::Pause, down) => self.pause = down,
+            (UserInput::Shoot, down) => self.shoot = down,
+            (UserInput::Quit,  down) => self.quit = down
+        }
+    }
 }
 
 pub struct Controller {
     pub canvas: Canvas<Window>,
     pub user_input: Control,
-    map: HashMap<Keycode, UserInput>,
+    map: HashMap<Keycode, (UserInput, bool)>,
     event_pump: sdl2::EventPump,
 
 }
@@ -55,13 +71,13 @@ impl Controller {
         let canvas = window.into_canvas().build().unwrap();
 
         let mut map = HashMap::new();
-        map.insert(Keycode::W, UserInput::Up);
-        map.insert(Keycode::S, UserInput::Down);
-        map.insert(Keycode::A, UserInput::Left);
-        map.insert(Keycode::D, UserInput::Right);
-        map.insert(Keycode::P, UserInput::Pause);
-        map.insert(Keycode::Q, UserInput::Quit);
-        map.insert(Keycode::Space, UserInput::Shoot);
+        map.insert(Keycode::W,      (UserInput::Up,    false));
+        map.insert(Keycode::S,      (UserInput::Down,  false));
+        map.insert(Keycode::A,      (UserInput::Left,  false));
+        map.insert(Keycode::D,      (UserInput::Right, false));
+        map.insert(Keycode::P,      (UserInput::Pause, false));
+        map.insert(Keycode::Q,      (UserInput::Quit,  false));
+        map.insert(Keycode::Space,  (UserInput::Shoot, false));
 
         let user_input = Control {
             ud: 0,
@@ -78,27 +94,32 @@ impl Controller {
     }
 
     pub fn parse_events(&mut self) {
-        let mut ud = 0;
-        let mut lr = 0;
-        let mut pause = false;
-        let mut quit = false;
-        let mut shoot = false;
 
         for event in self.event_pump.poll_iter() {
             if let Event::KeyDown{keycode: Some(key), ..} = event {
-                match self.map.get(&key) {
-                    Some(UserInput::Up)    => if ud == 0 {ud = 1},
-                    Some(UserInput::Down)  => if ud == 0 {ud = -1},
-                    Some(UserInput::Left)  => if lr == 0 {lr = -1},
-                    Some(UserInput::Right) => if lr == 0 {lr = 1},
-                    Some(UserInput::Pause) => pause = true,
-                    Some(UserInput::Shoot) => shoot = true,
-                    Some(UserInput::Quit)  => quit = true,
-                    None => (),
+                if let Some((key, pressed)) = self.map.get_mut(&key) {
+                    *pressed = true;
+                }
+            }
+            if let Event::KeyUp{keycode: Some(key), ..} = event {
+                if let Some((key, pressed)) = self.map.get_mut(&key) {
+                    *pressed = false;
                 }
             }
         }
-        self.user_input = Control {ud, lr, pause, quit, shoot, update_time: time::Instant::now()}
+        self.user_input.ud = 0;
+        self.user_input.lr = 0;
+        for (key, pressed) in self.map.values() {
+            match key {
+                UserInput::Up    => if *pressed { self.user_input.ud += 1 },
+                UserInput::Down  => if *pressed { self.user_input.ud -= 1 },
+                UserInput::Left  => if *pressed { self.user_input.lr -= 1 },
+                UserInput::Right => if *pressed { self.user_input.lr += 1 },
+                UserInput::Pause => self.user_input.pause = *pressed,
+                UserInput::Quit  => self.user_input.quit  = *pressed,
+                UserInput::Shoot => self.user_input.shoot = *pressed,
+            }
+        }
     }
 
     pub fn draw_background(&mut self) {
