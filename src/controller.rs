@@ -31,19 +31,6 @@ impl Control {
         secs + millis
     }
 
-    fn update(&mut self, ui: &UserInput, keydown: bool ) {
-        match (ui, keydown) {
-            (UserInput::Up,    true)  | (UserInput::Down, false)  => self.ud += 1,
-            (UserInput::Up,    false) | (UserInput::Down, true)   => self.ud -= 1,
-
-            (UserInput::Right, true)  | (UserInput::Left, false)  => self.lr += 1,
-            (UserInput::Right, false) | (UserInput::Left, true)   => self.lr -= 1,
-
-            (UserInput::Pause, down) => self.pause = down,
-            (UserInput::Shoot, down) => self.shoot = down,
-            (UserInput::Quit,  down) => self.quit = down
-        }
-    }
 }
 
 pub struct Controller {
@@ -97,12 +84,12 @@ impl Controller {
 
         for event in self.event_pump.poll_iter() {
             if let Event::KeyDown{keycode: Some(key), ..} = event {
-                if let Some((key, pressed)) = self.map.get_mut(&key) {
+                if let Some((_, pressed)) = self.map.get_mut(&key) {
                     *pressed = true;
                 }
             }
             if let Event::KeyUp{keycode: Some(key), ..} = event {
-                if let Some((key, pressed)) = self.map.get_mut(&key) {
+                if let Some((_, pressed)) = self.map.get_mut(&key) {
                     *pressed = false;
                 }
             }
@@ -120,6 +107,7 @@ impl Controller {
                 UserInput::Shoot => self.user_input.shoot = *pressed,
             }
         }
+        self.user_input.update_time = time::Instant::now();
 
     }
 

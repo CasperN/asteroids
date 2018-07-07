@@ -29,9 +29,9 @@ impl Ship {
             pos: (X_LEN / 2.0, Y_LEN / 2.0),
             vel: (0.0, 0.0),
             theta: PI,
-            torque: 1e-5,
+            torque: 10.0,
             omega: 0.0,
-            thrust: 1e-4
+            thrust: 50.0
         }
     }
 
@@ -57,7 +57,7 @@ impl_Angle!(Ship);
 
 impl Velocity for Ship {
     const WRAP_AROUND: bool = true;
-    const SPEED_DECAY: f32 = 0.9;
+    const SPEED_DECAY: f32 = 0.98;
 
     fn get_vel(&self) -> (f32, f32) {
         self.vel
@@ -68,7 +68,7 @@ impl Velocity for Ship {
 }
 
 impl AngularVelocity for Ship {
-    const ROTATION_DECAY: f32 = 0.9;
+    const ROTATION_DECAY: f32 = 0.95;
 
     fn get_omega(&self) -> f32 {
         self.omega
@@ -90,7 +90,6 @@ impl Controllable for Ship {
 
         let dt = control.elapsed_time();
 
-        // println!("rotate {:?} dt {:?}",rotate, dt );
         self.angular_accelerate(rotate, dt);
         self.accelerate((x_acc, y_acc), dt);
     }

@@ -41,9 +41,6 @@ fn main() {
         ship.move_position(io.user_input.elapsed_time());
         ship.rotate(io.user_input.elapsed_time());
 
-
         io.canvas.present();
-        println!("lr: {:?} ud: {:?} omega: {:?} vel: {:?}",
-            io.user_input.lr, io.user_input.ud, ship.get_omega(), ship.get_vel());
     }
 }
