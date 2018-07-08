@@ -2,24 +2,19 @@
 #![feature(euclidean_division)]
 extern crate sdl2;
 use std::{thread, time};
-// use sdl2::pixels::Color;
 
 mod vector_2d;
+
 mod controller;
 use controller::Controller;
-// mod asteroid;
-mod momentum;
-
 
 #[macro_use]
 mod traits;
 use traits::*;
-
 mod entities;
 
 const X_LEN :f32 = 100.0;
 const Y_LEN :f32 = 100.0;
-
 
 
 fn pause_loop(_io: &mut Controller){
@@ -43,7 +38,6 @@ fn main() {
         ship.render(&mut io.canvas);
         ship.control_update(&io.user_input);
         ship.move_position(io.user_input.elapsed_time());
-        ship.rotate(io.user_input.elapsed_time());
 
         io.canvas.present();
     }

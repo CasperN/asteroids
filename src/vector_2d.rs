@@ -1,21 +1,21 @@
 
+#[derive(Debug, Clone, Copy)]
+pub struct V2(pub f32, pub f32);
 
-pub struct V2(f32, f32);
-impl V2 {
-
-    pub fn new(v: (f32, f32)) -> V2 {
-        let (x,y) = v;
-        return V2(x,y)
-    }
-
+impl V2 {    
     pub fn scale(&self, a: f32) -> V2 {
         let V2(x, y) = self;
         V2(a * x, a * y)
     }
 
-    pub fn add_(&self, wx: f32, wy:f32) -> V2 {
-        let V2(vx, vy) = self;
-        V2(vx + wx, vy + wy)
+    pub fn scale_2d(&self, sx: f32, sy:f32) -> V2 {
+        let V2(x,y) = self;
+        V2(sx * x, sy * y)
+    }
+
+    pub fn mod_euc(&self, xmod: f32, ymod: f32) -> V2 {
+        let V2(x,y) = self;
+        V2(x.mod_euc(xmod), y.mod_euc(ymod))
     }
 
     pub fn add(&self, w: V2) -> V2 {
