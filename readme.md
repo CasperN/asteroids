@@ -45,7 +45,15 @@ misc
         key map (sdl2 event to internal control interpretation)
         get_control_struct(&self)
 ```
-# TODO
+# TODO Soon
+* Circle Asteroids
+* Helper functions for 2d vector math
+* Bullets
+* Collision system
+* Toggle whether things wrap around the border or stick to it
+
+
+# TODO Far future
 * save/load
 * scores
 * remap control

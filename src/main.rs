@@ -4,8 +4,12 @@ extern crate sdl2;
 use std::{thread, time};
 // use sdl2::pixels::Color;
 
+mod vector_2d;
 mod controller;
 use controller::Controller;
+// mod asteroid;
+mod momentum;
+
 
 #[macro_use]
 mod traits;
