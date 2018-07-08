@@ -5,3 +5,4 @@ authors = ["Casper Neo <casperneo@uchicago.edu>"]
 
 [dependencies]
 sdl2 = "0.31.0"
+rand = "0.5.3"

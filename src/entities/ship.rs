@@ -1,15 +1,11 @@
 use std::f32::consts::PI;
 
 extern crate sdl2;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
 use sdl2::pixels::Color;
-use sdl2::rect::Point;
 
 use controller::Control;
 use traits::{Controllable, Render, Momentum, MomentumC};
 use vector_2d::V2;
-
 use X_LEN;
 use Y_LEN;
 
@@ -40,14 +36,6 @@ impl Ship {
             thrust: 50.0
         }
     }
-
-    fn get_outline(&self) -> Vec<V2> {
-        let mc = self.get_momentum();
-        Ship::OUTLINE
-            .iter()
-            .map(|p| p.rotate(mc.theta).add(mc.pos))
-            .collect()
-    }
 }
 
 impl Momentum for Ship {
@@ -75,24 +63,14 @@ impl Controllable for Ship {
 
 
 impl Render for Ship {
-    fn render(&self, canvas: &mut Canvas<Window>){
-        let mut outline :Vec<V2> = self.get_outline();
-        let head = outline[0];
-        outline.push(head);
-
-        let frame = canvas.viewport();
-        let x_scale = (frame.right() - frame.left()) as f32 / X_LEN;
-        let y_scale = (frame.bottom() - frame.top()) as f32 / Y_LEN;
-        let offset = V2(frame.left() as f32, frame.top() as f32);
-
-        let points = outline.iter()
-            .map(|p| {
-                 let V2(x, y) = p.scale_2d(x_scale, y_scale).add(offset);
-                 Point::new(x as i32, y as i32)
-            }).collect::<Vec<Point>>();
-
-
-        canvas.set_draw_color(Color::RGB(255, 0, 0));
-        canvas.draw_lines(points.as_slice()).unwrap();
+    fn get_outline(&self) -> Vec<V2> {
+        let mc = self.get_momentum();
+        Ship::OUTLINE
+            .iter()
+            .map(|p| p.rotate(mc.theta).add(mc.pos))
+            .collect()
+    }
+    fn get_color(&self) -> Color {
+        Color::RGB(255, 0, 0)
     }
 }

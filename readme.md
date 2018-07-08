@@ -1,19 +1,11 @@
 
 # Architecture
 ```
-game_components (traits)
-    Position
-        get_xy **
-        get_xy_mut **
-    Velocity
-        Position **
-        get_vxy **
-        get_vxy_mut **
-        accelerate
-        move
-    Control
-        Velocity **
-        control_update
+traits (Components)
+    Momentum
+
+    Controllable
+
     Outline
         get_outline **
         intersection
@@ -45,9 +37,16 @@ misc
         key map (sdl2 event to internal control interpretation)
         get_control_struct(&self)
 ```
-# TODO Soon
-* Circle Asteroids
-* Helper functions for 2d vector math
+# Done so far
+* Control system
+* Momentum system
+* Rendering outlines
+* 2d vector helper functions
+* Ship (Momentum + Controllable + Render)
+* Asteroid (Momentum + Render)
+
+# TODO Now
+* Asteroid spawning / de-spawning
 * Bullets
 * Collision system
 * Toggle whether things wrap around the border or stick to it

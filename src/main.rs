@@ -26,6 +26,7 @@ fn main() {
 
     let mut io = Controller::new();
     let mut ship = entities::Ship::new();
+    let mut a = entities::Asteroid::new(&mut io.rng, 5.0);
 
     'game: loop {
         io.parse_events();
@@ -34,10 +35,15 @@ fn main() {
 
         if io.user_input.quit { break 'game }
         if io.user_input.pause { pause_loop(&mut io) }
+
         io.draw_background();
         ship.render(&mut io.canvas);
+        a.render(&mut io.canvas);
+
         ship.control_update(&io.user_input);
+
         ship.move_position(io.user_input.elapsed_time());
+        a.move_position(io.user_input.elapsed_time());
 
         io.canvas.present();
     }

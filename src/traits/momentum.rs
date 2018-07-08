@@ -42,4 +42,9 @@ pub trait Momentum {
         mc.omega += torque * time / mc.mass;
         mc.omega *= Self::ROTATION_DECAY;
     }
+
+    fn in_bounds(&self) -> bool {
+        let V2(x,y) = self.get_momentum().pos;
+        0.0 <= x && x <= X_LEN && 0.0 <= y && y <= Y_LEN
+    }
 }

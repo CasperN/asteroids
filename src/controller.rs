@@ -8,6 +8,8 @@ use sdl2::video::Window;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 
+extern crate rand;
+
 enum UserInput {
     Up, Down, Left, Right, Pause, Shoot, Quit
 }
@@ -36,6 +38,7 @@ impl Control {
 pub struct Controller {
     pub canvas: Canvas<Window>,
     pub user_input: Control,
+    pub rng: rand::rngs::ThreadRng,
     map: HashMap<Keycode, (UserInput, bool)>,
     event_pump: sdl2::EventPump,
 
@@ -77,7 +80,7 @@ impl Controller {
 
         let event_pump = sdl_context.event_pump().unwrap();
 
-        Controller { map, canvas, user_input, event_pump }
+        Controller { map, canvas, user_input, event_pump, rng: rand::thread_rng() }
     }
 
     pub fn parse_events(&mut self) {
