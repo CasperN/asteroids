@@ -5,7 +5,7 @@ use X_LEN;
 use Y_LEN;
 
 #[derive(Debug, Clone, Copy)]
-pub struct MomentumC {
+pub struct Inertia {
     pub pos: V2,
     pub vel: V2,
     pub theta: f32,
@@ -18,8 +18,8 @@ pub trait Momentum {
     const WRAP_AROUND: bool;
     const ROTATION_DECAY: f32;
 
-    fn get_momentum(&self) -> &MomentumC;
-    fn get_momentum_mut(&mut self) -> &mut MomentumC;
+    fn get_momentum(&self) -> &Inertia;
+    fn get_momentum_mut(&mut self) -> &mut Inertia;
 
     fn move_position(&mut self, time: f32) {
         let mc = self.get_momentum_mut();

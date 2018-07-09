@@ -26,7 +26,8 @@ fn main() {
 
     let mut io = Controller::new();
     let mut ship = entities::Ship::new();
-    let mut a = entities::Asteroid::new(&mut io.rng, 5.0);
+    let mut projectiles = Vec::<entities::Projectile>::new();
+    let mut asteroid_belt = entities::AsteroidSpawner::new();
 
     'game: loop {
         io.parse_events();
@@ -37,13 +38,26 @@ fn main() {
         if io.user_input.pause { pause_loop(&mut io) }
 
         io.draw_background();
-        ship.render(&mut io.canvas);
-        a.render(&mut io.canvas);
 
         ship.control_update(&io.user_input);
-
         ship.move_position(io.user_input.elapsed_time());
-        a.move_position(io.user_input.elapsed_time());
+        ship.render(&mut io.canvas);
+
+        projectiles = projectiles.into_iter()
+            .map(|mut p|{
+                p.move_position(io.user_input.elapsed_time());
+                p.render(&mut io.canvas);
+                p
+            })
+            .filter(|p| p.in_bounds())
+            .collect();
+
+        if let Some(a) = asteroid_belt.maybe_shoot(&mut io.rng) {
+            projectiles.push(a);
+        }
+        if let Some(b) = ship.maybe_shoot(&mut io.rng) {
+            projectiles.push(b);
+        }
 
         io.canvas.present();
     }

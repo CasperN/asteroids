@@ -111,7 +111,6 @@ impl Controller {
             }
         }
         self.user_input.update_time = time::Instant::now();
-
     }
 
     pub fn draw_background(&mut self) {
