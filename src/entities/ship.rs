@@ -8,7 +8,7 @@ use sdl2::pixels::Color;
 
 use controller::Control;
 use entities::{Projectile};
-use components::{Controllable, Outlinable, Momentum, Inertia, Shooter};
+use components::{Controllable, Outlinable, Momentum, Inertia, Shooter, EdgeBehaviour};
 use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
@@ -53,7 +53,7 @@ impl Ship {
 
 impl Momentum for Ship {
     const SPEED_DECAY: f32 = 0.55;
-    const WRAP_AROUND: bool = true;
+    const EDGE: EdgeBehaviour = EdgeBehaviour::Wall;
     const ROTATION_DECAY: f32 = 0.25;
 
     fn get_momentum(&self) -> &Inertia{

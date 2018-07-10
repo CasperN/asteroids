@@ -13,9 +13,14 @@ pub struct Inertia {
     pub mass: f32, // also moment of inertia
 }
 
+ #[allow(dead_code)]
+pub enum EdgeBehaviour {
+    Pass, PacMan, Wall
+}
+
 pub trait Momentum {
     const SPEED_DECAY: f32;
-    const WRAP_AROUND: bool;
+    const EDGE: EdgeBehaviour;
     const ROTATION_DECAY: f32;
 
     fn get_momentum(&self) -> &Inertia;
@@ -25,8 +30,15 @@ pub trait Momentum {
         let mc = self.get_momentum_mut();
 
         mc.pos = mc.pos + mc.vel.scale(time);
-        if Self::WRAP_AROUND {
-            mc.pos = mc.pos.mod_euc(X_LEN, Y_LEN);
+        match Self::EDGE {
+            EdgeBehaviour::PacMan => mc.pos = mc.pos.mod_euc(X_LEN, Y_LEN),
+            EdgeBehaviour::Pass => (),
+            EdgeBehaviour::Wall => {
+                if mc.pos.0 < 0.0 { mc.pos.0 = 0.0; mc.vel.0 = 0.0; }
+                if mc.pos.1 < 0.0 { mc.pos.1 = 0.0; mc.vel.1 = 0.0; }
+                if mc.pos.0 > X_LEN { mc.pos.0 = X_LEN; mc.vel.0 = 0.0; }
+                if mc.pos.1 > Y_LEN { mc.pos.1 = Y_LEN; mc.vel.1 = 0.0; }
+            }
         }
 
         mc.theta += mc.omega * time;

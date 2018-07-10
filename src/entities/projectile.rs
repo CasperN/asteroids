@@ -5,7 +5,7 @@ extern crate rand;
 extern crate sdl2;
 use sdl2::pixels::Color;
 
-use components::{Momentum, Inertia, Outlinable, Despawnable};
+use components::{Momentum, Inertia, Outlinable, Despawnable, EdgeBehaviour};
 use vector_2d::{V2, roots_of_unity};
 use X_LEN;
 use Y_LEN;
@@ -22,7 +22,7 @@ pub struct Projectile {
 impl Momentum for Projectile {
     const SPEED_DECAY: f32 = 0.0;
     const ROTATION_DECAY: f32 = 0.0;
-    const WRAP_AROUND: bool = false;
+    const EDGE: EdgeBehaviour = EdgeBehaviour::Pass;
 
     fn get_momentum(&self) -> &Inertia{
         &self.momentum
