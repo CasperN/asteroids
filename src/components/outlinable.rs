@@ -8,7 +8,6 @@ use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
 
-
 pub trait Outlinable {
 
     fn get_outline(&self) -> (Vec<V2>, Color);
@@ -25,7 +24,7 @@ pub trait Outlinable {
 
         let points: Vec<Point> = outline.iter()
             .map( |p| {
-                 let V2(x, y) = p.scale_2d(x_scale, y_scale).add(offset);
+                 let V2(x, y) = p.scale_2d(x_scale, y_scale) + offset;
                  Point::new(x as i32, y as i32)
             }).collect();
 

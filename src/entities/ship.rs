@@ -8,7 +8,7 @@ use sdl2::pixels::Color;
 
 use controller::Control;
 use entities::{Projectile};
-use traits::{Controllable, Outlinable, Momentum, Inertia, Shooter};
+use components::{Controllable, Outlinable, Momentum, Inertia, Shooter};
 use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
@@ -31,7 +31,7 @@ impl Ship {
     ];
 
     pub fn new() -> Self {
-        let fire_rate = Duration::from_millis(200);
+        let fire_rate = Duration::from_millis(300);
         let last_fired = Instant::now() - fire_rate;
 
         Ship {
@@ -52,9 +52,9 @@ impl Ship {
 }
 
 impl Momentum for Ship {
-    const SPEED_DECAY: f32 = 0.98;
+    const SPEED_DECAY: f32 = 0.55;
     const WRAP_AROUND: bool = true;
-    const ROTATION_DECAY: f32 = 0.95;
+    const ROTATION_DECAY: f32 = 0.25;
 
     fn get_momentum(&self) -> &Inertia{
         &self.momentum
@@ -93,7 +93,7 @@ impl Outlinable for Ship {
         let mc = self.get_momentum();
         let outline: Vec<V2> = Ship::OUTLINE
             .iter()
-            .map(|p| p.rotate(mc.theta).add(mc.pos))
+            .map(|p| p.rotate(mc.theta) + mc.pos)
             .collect();
         let color = Color::RGB(255, 0, 0);
         (outline, color)

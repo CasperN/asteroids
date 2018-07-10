@@ -5,7 +5,7 @@ extern crate rand;
 extern crate sdl2;
 use sdl2::pixels::Color;
 
-use traits::{Momentum, Inertia, Outlinable};
+use components::{Momentum, Inertia, Outlinable, Despawnable};
 use vector_2d::{V2, roots_of_unity};
 use X_LEN;
 use Y_LEN;
@@ -15,6 +15,7 @@ pub struct Projectile {
     pub momentum: Inertia,
     pub relative_outline: Vec<V2>,
     pub color: Color,
+    pub was_hit: bool,
 }
 
 
@@ -38,11 +39,18 @@ impl Outlinable for Projectile {
         let theta = self.get_momentum().theta;
 
         let outline = self.relative_outline.iter()
-            .map(|v| v.rotate(theta).add(pos) )
+            .map(|v| v.rotate(theta) + pos )
             .collect();
         (outline, self.color)
     }
 }
+
+impl Despawnable for Projectile {
+    fn should_despawn(&self) -> bool {
+        !self.in_bounds() || self.was_hit
+    }
+}
+
 
 impl Projectile {
 
@@ -70,20 +78,20 @@ impl Projectile {
 
         let color = Color::RGB(0, 255, 0);
 
-        Projectile { momentum, relative_outline, color }
+        Projectile { momentum, relative_outline, color, was_hit: false, }
     }
 
     pub fn new_bullet<R: rand::Rng>(_rng: &mut R, source: &Inertia) -> Projectile {
         let momentum = Inertia {
             pos: source.pos,
-            vel: source.vel.add(V2(0.0, 100.0).rotate(source.theta)),
+            vel: source.vel + V2(0.0, 50.0).rotate(source.theta),
             theta: source.theta,
             omega: 0.0,
             mass: 0.1,
         };
-        let relative_outline = vec![V2(0.0, 0.0), V2(0.0, -1.0)];
+        let relative_outline = vec![V2(0.0, 1.0), V2(0.0, -1.0)];
         let color = Color::RGB(255, 255, 255);
-        Projectile { momentum, relative_outline, color, }
+        Projectile { momentum, relative_outline, color, was_hit: false, }
     }
 
 }

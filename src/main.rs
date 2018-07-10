@@ -1,17 +1,18 @@
 #![feature(duration_extras)]
 #![feature(euclidean_division)]
+
 extern crate sdl2;
 use std::{thread, time};
 
 mod vector_2d;
-
+mod collisions;
 mod controller;
-use controller::Controller;
-
-#[macro_use]
-mod traits;
-use traits::*;
 mod entities;
+mod components;
+
+use collisions::find_collisions;
+use controller::Controller;
+use components::*;
 
 const X_LEN :f32 = 100.0;
 const Y_LEN :f32 = 100.0;
@@ -49,7 +50,7 @@ fn main() {
                 p.render(&mut io.canvas);
                 p
             })
-            .filter(|p| p.in_bounds())
+            .filter(|p| !p.should_despawn())
             .collect();
 
         if let Some(a) = asteroid_belt.maybe_shoot(&mut io.rng) {
@@ -59,6 +60,12 @@ fn main() {
             projectiles.push(b);
         }
 
+        let outlines = projectiles.iter().map(|p| p.get_outline().0).collect();
+        let collisions = find_collisions(&outlines);
+        for (a,b) in collisions {
+            projectiles[a].was_hit = true;
+            projectiles[b].was_hit = true;
+        }
         io.canvas.present();
     }
 }

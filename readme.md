@@ -1,27 +1,24 @@
 
 # Architecture
 ```
-traits (Components)
-    Momentum
-
-    Controllable
-
-    Outline
+Trait / Components
+    Momentum / Inertia
+    Controllable / Control
+    Outlineable / Outline
         get_outline **
         intersection
-    Display
-        Outline **
         render
-    System
-        update_entities **
-
-entities
+Entities
     Asteroid
-    Ship
-    Bullet
-    MenuScreen
-    PauseScreen
-    GameBackgroundScreen
+    Ship (Control, Outline, Inertia)
+    Bullet (Outline, Inertia)
+
+Systems
+    Control   :: Ship -> ()
+    Rendering :: [outlines] -> ()
+    Collision :: [outlines] -> [(EntityID, EntityID)]
+    Shooting :: [Ship, AsteroidSpawner] -> new projectile
+
 
 stateFrames (owns entities and lower stateFrames)
     stateFrame trait
@@ -44,12 +41,15 @@ misc
 * 2d vector helper functions
 * Ship (Momentum + Controllable + Render)
 * Asteroid (Momentum + Render)
+* Asteroid spawning / de-spawning
+* Projectiles
+* Collision detection system
 
 # TODO Now
-* Asteroid spawning / de-spawning
-* Bullets
-* Collision system
 * Toggle whether things wrap around the border or stick to it
+* Health system
+* Asteroid Breaking
+* Impact physics
 
 
 # TODO Far future

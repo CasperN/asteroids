@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 extern crate rand;
 
 use entities::Projectile;
-use traits::{Shooter,};
+use components::{Shooter,};
 
 
 pub struct AsteroidSpawner {
@@ -31,7 +31,7 @@ impl Shooter for AsteroidSpawner {
         }
         self.last_fired = Instant::now();
 
-        let size = rng.gen_range(self.level as f32, self.level as f32 * 2.0);
+        let size = rng.gen_range(self.level as f32, self.level as f32 * 10.0);
         let speed = self.level as f32* 5.0;
         let asteroid = Projectile::new_asteroid(rng, size, speed);
         Some(asteroid)

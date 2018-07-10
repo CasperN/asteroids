@@ -24,7 +24,7 @@ pub trait Momentum {
     fn move_position(&mut self, time: f32) {
         let mc = self.get_momentum_mut();
 
-        mc.pos = mc.pos.add(mc.vel.scale(time));
+        mc.pos = mc.pos + mc.vel.scale(time);
         if Self::WRAP_AROUND {
             mc.pos = mc.pos.mod_euc(X_LEN, Y_LEN);
         }
@@ -36,11 +36,11 @@ pub trait Momentum {
     fn impart(&mut self, force: V2, torque: f32, time: f32) {
         let mc = self.get_momentum_mut();
 
-        mc.vel = mc.vel.add(force.scale(time / mc.mass))
-                       .scale(Self::SPEED_DECAY);
+        mc.vel += force.scale(time / mc.mass);
+        mc.vel = mc.vel.scale(Self::SPEED_DECAY.powf(time));
 
         mc.omega += torque * time / mc.mass;
-        mc.omega *= Self::ROTATION_DECAY;
+        mc.omega *= Self::ROTATION_DECAY.powf(time);
     }
 
     fn in_bounds(&self) -> bool {
