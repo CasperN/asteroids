@@ -13,9 +13,11 @@ pub struct Inertia {
     pub mass: f32, // also moment of inertia
 }
 
- #[allow(dead_code)]
+#[allow(dead_code)]
 pub enum EdgeBehaviour {
-    Pass, PacMan, Wall
+    Pass,
+    PacMan,
+    Wall,
 }
 
 pub trait Momentum {
@@ -34,10 +36,22 @@ pub trait Momentum {
             EdgeBehaviour::PacMan => mc.pos = mc.pos.mod_euc(X_LEN, Y_LEN),
             EdgeBehaviour::Pass => (),
             EdgeBehaviour::Wall => {
-                if mc.pos.0 < 0.0 { mc.pos.0 = 0.0; mc.vel.0 = 0.0; }
-                if mc.pos.1 < 0.0 { mc.pos.1 = 0.0; mc.vel.1 = 0.0; }
-                if mc.pos.0 > X_LEN { mc.pos.0 = X_LEN; mc.vel.0 = 0.0; }
-                if mc.pos.1 > Y_LEN { mc.pos.1 = Y_LEN; mc.vel.1 = 0.0; }
+                if mc.pos.0 < 0.0 {
+                    mc.pos.0 = 0.0;
+                    mc.vel.0 = 0.0;
+                }
+                if mc.pos.1 < 0.0 {
+                    mc.pos.1 = 0.0;
+                    mc.vel.1 = 0.0;
+                }
+                if mc.pos.0 > X_LEN {
+                    mc.pos.0 = X_LEN;
+                    mc.vel.0 = 0.0;
+                }
+                if mc.pos.1 > Y_LEN {
+                    mc.pos.1 = Y_LEN;
+                    mc.vel.1 = 0.0;
+                }
             }
         }
 
@@ -56,7 +70,7 @@ pub trait Momentum {
     }
 
     fn in_bounds(&self) -> bool {
-        let V2(x,y) = self.get_momentum().pos;
+        let V2(x, y) = self.get_momentum().pos;
         0.0 <= x && x <= X_LEN && 0.0 <= y && y <= Y_LEN
     }
 }

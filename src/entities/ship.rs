@@ -6,9 +6,9 @@ extern crate rand;
 extern crate sdl2;
 use sdl2::pixels::Color;
 
+use components::*;
 use controller::Control;
-use entities::{Projectile};
-use components::{Controllable, Outlinable, Momentum, Inertia, Shooter, EdgeBehaviour};
+use entities::Projectile;
 use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
@@ -20,15 +20,11 @@ pub struct Ship {
     is_firing: bool,
     fire_rate: Duration,
     last_fired: Instant,
+    pub was_hit: bool,
 }
 
 impl Ship {
-    const OUTLINE: [V2; 4] = [
-        V2(-1.0, 0.0),
-        V2(0.0, 2.0),
-        V2(1.0, 0.0),
-        V2(0.0, -1.0)
-    ];
+    const OUTLINE: [V2; 4] = [V2(-1.0, 0.0), V2(0.0, 2.0), V2(1.0, 0.0), V2(0.0, -1.0)];
 
     pub fn new() -> Self {
         let fire_rate = Duration::from_millis(300);
@@ -45,6 +41,7 @@ impl Ship {
             torque: 10.0,
             thrust: 25.0,
             is_firing: false,
+            was_hit: false,
             fire_rate,
             last_fired,
         }
@@ -56,10 +53,10 @@ impl Momentum for Ship {
     const EDGE: EdgeBehaviour = EdgeBehaviour::Wall;
     const ROTATION_DECAY: f32 = 0.25;
 
-    fn get_momentum(&self) -> &Inertia{
+    fn get_momentum(&self) -> &Inertia {
         &self.momentum
     }
-    fn get_momentum_mut(&mut self) -> &mut Inertia{
+    fn get_momentum_mut(&mut self) -> &mut Inertia {
         &mut self.momentum
     }
 }
@@ -68,12 +65,10 @@ impl Controllable for Ship {
     fn control_update(&mut self, control: &Control) {
         self.is_firing = control.shoot;
         let torque = -control.lr as f32 * self.torque;
-        let force = V2(0.0, self.thrust * control.ud as f32)
-            .rotate(self.get_momentum().theta);
+        let force = V2(0.0, self.thrust * control.ud as f32).rotate(self.get_momentum().theta);
 
         let dt = control.elapsed_time();
         self.impart(force, torque, dt);
-
     }
 }
 
@@ -99,3 +94,5 @@ impl Outlinable for Ship {
         (outline, color)
     }
 }
+
+impl Despawnable {}
