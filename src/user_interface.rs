@@ -10,7 +10,7 @@ use sdl2::video::Window;
 
 extern crate rand;
 
-enum UserInput {
+enum Controls {
     Up,
     Down,
     Left,
@@ -21,7 +21,7 @@ enum UserInput {
 }
 
 #[derive(Debug)]
-pub struct Control {
+pub struct UserInput {
     pub ud: i8,
     pub lr: i8,
     pub pause: bool,
@@ -30,7 +30,7 @@ pub struct Control {
     pub update_time: time::Instant,
 }
 
-impl Control {
+impl UserInput {
     pub fn elapsed_time(&self) -> f32 {
         let e = self.update_time.elapsed();
         let secs = e.as_secs() as f32;
@@ -39,15 +39,15 @@ impl Control {
     }
 }
 
-pub struct Controller {
+pub struct UserInterface {
     pub canvas: Canvas<Window>,
-    pub user_input: Control,
+    pub user_input: UserInput,
     pub rng: rand::rngs::ThreadRng,
-    map: HashMap<Keycode, (UserInput, bool)>,
+    map: HashMap<Keycode, (Controls, bool)>,
     event_pump: sdl2::EventPump,
 }
 
-impl Controller {
+impl UserInterface {
     pub const SCREEN_WIDTH: u32 = 800;
     pub const SCREEN_HEIGHT: u32 = 800;
 
@@ -70,15 +70,15 @@ impl Controller {
         let canvas = window.into_canvas().build().unwrap();
 
         let mut map = HashMap::new();
-        map.insert(Keycode::W, (UserInput::Up, false));
-        map.insert(Keycode::S, (UserInput::Down, false));
-        map.insert(Keycode::A, (UserInput::Left, false));
-        map.insert(Keycode::D, (UserInput::Right, false));
-        map.insert(Keycode::P, (UserInput::Pause, false));
-        map.insert(Keycode::Q, (UserInput::Quit, false));
-        map.insert(Keycode::Space, (UserInput::Shoot, false));
+        map.insert(Keycode::W, (Controls::Up, false));
+        map.insert(Keycode::S, (Controls::Down, false));
+        map.insert(Keycode::A, (Controls::Left, false));
+        map.insert(Keycode::D, (Controls::Right, false));
+        map.insert(Keycode::P, (Controls::Pause, false));
+        map.insert(Keycode::Q, (Controls::Quit, false));
+        map.insert(Keycode::Space, (Controls::Shoot, false));
 
-        let user_input = Control {
+        let user_input = UserInput {
             ud: 0,
             lr: 0,
             quit: false,
@@ -89,7 +89,7 @@ impl Controller {
 
         let event_pump = sdl_context.event_pump().unwrap();
 
-        Controller {
+        UserInterface {
             map,
             canvas,
             user_input,
@@ -121,21 +121,21 @@ impl Controller {
         self.user_input.lr = 0;
         for (key, pressed) in self.map.values() {
             match key {
-                UserInput::Up => if *pressed {
+                Controls::Up => if *pressed {
                     self.user_input.ud += 1
                 },
-                UserInput::Down => if *pressed {
+                Controls::Down => if *pressed {
                     self.user_input.ud -= 1
                 },
-                UserInput::Left => if *pressed {
+                Controls::Left => if *pressed {
                     self.user_input.lr -= 1
                 },
-                UserInput::Right => if *pressed {
+                Controls::Right => if *pressed {
                     self.user_input.lr += 1
                 },
-                UserInput::Pause => self.user_input.pause = *pressed,
-                UserInput::Quit => self.user_input.quit = *pressed,
-                UserInput::Shoot => self.user_input.shoot = *pressed,
+                Controls::Pause => self.user_input.pause = *pressed,
+                Controls::Quit => self.user_input.quit = *pressed,
+                Controls::Shoot => self.user_input.shoot = *pressed,
             }
         }
         self.user_input.update_time = time::Instant::now();

@@ -1,22 +1,40 @@
 use std::cmp::Ordering;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
+use system::EMap;
 use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
 
-const NUM_CELLS: usize = 1;
+const NUM_CELLS: usize = 10;
 
-pub fn find_collisions(outlines: &Vec<Vec<V2>>) -> Vec<(usize, usize)> {
-    // let outlines: Vec<Vec<V2>> = outlinables.iter().map(|o| o.get_outline().0).collect();
+pub fn find_collisions(outlines: &HashSet<usize>, entities: &mut EMap) -> Vec<(usize, usize)> {
+    let outlines: HashMap<usize, Vec<V2>> = outlines
+        .iter()
+        .flat_map(|id| {
+            let entity = entities.get(id);
+            entity
+                .and_then(|e| e.outline.as_ref())
+                .and_then(|o| {
+                    if let Some(m) = entity.and_then(|e| e.momentum.as_ref()) {
+                        return Some((*id, o.compute_outline(&m)));
+                    }
+                    None
+                })
+                .into_iter()
+        })
+        .collect();
 
-    // collect shapes by the gridcells that their points are in
+    grid_search(&outlines)
+}
+
+fn grid_search(outlines: &HashMap<usize, Vec<V2>>) -> Vec<(usize, usize)> {
     let mut grid = vec![HashSet::<usize>::new(); NUM_CELLS * NUM_CELLS];
 
-    for (idx, o) in outlines.iter().enumerate() {
-        for mc in o.iter().map(to_cell_id) {
-            if let Some(c) = mc {
-                grid[c].insert(idx);
+    for (idx, o) in outlines.iter() {
+        for maybe_cell in o.iter().map(to_cell_id) {
+            if let Some(cell) = maybe_cell {
+                grid[cell].insert(*idx);
             }
         }
     }
@@ -41,13 +59,15 @@ pub fn find_collisions(outlines: &Vec<Vec<V2>>) -> Vec<(usize, usize)> {
     // find collisions among pairs
     let mut collisions = Vec::new();
     'outlines: for (i, j) in matches.drain() {
-        let n = outlines[i].len();
-        let m = outlines[j].len();
+        let i_outline = outlines.get(&i).unwrap();
+        let j_outline = outlines.get(&j).unwrap();
+        let n = i_outline.len();
+        let m = j_outline.len();
 
         for ii in 0..n {
-            for jj in 0..m {
-                let i_seg = LineSegment(outlines[i][ii], outlines[i][(ii + 1) % n]);
-                let j_seg = LineSegment(outlines[j][jj], outlines[j][(jj + 1) % m]);
+            for jj in ii..m {
+                let i_seg = LineSegment(i_outline[ii], i_outline[(ii + 1) % n]);
+                let j_seg = LineSegment(j_outline[jj], j_outline[(jj + 1) % m]);
 
                 if i_seg.intersects(&j_seg) {
                     collisions.push((i, j));
@@ -109,48 +129,48 @@ impl LineSegment {
         || (o4 == Ordering::Equal && other.bounding_box_contains_point(&self.1))
     }
 }
-//
-// #[cfg(test)]
-// mod segments {
-//     use super::*;
-//
-//     #[test]
-//     fn collinear_no_overlap() {
-//         let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
-//         let b = LineSegment(V2(2.0, 2.0), V2(3.0, 3.0));
-//         assert!(!a.intersects(&b));
-//         assert!(!b.intersects(&a));
-//     }
-//     #[test]
-//     fn collinear_overlap() {
-//         let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
-//         let b = LineSegment(V2(0.5, 0.5), V2(1.5, 1.5));
-//         assert!(a.intersects(&b));
-//         assert!(b.intersects(&a));
-//     }
-//     #[test]
-//     fn perpendicular_overlap() {
-//         let a = LineSegment(V2(-1.0, -1.0), V2(1.0, 1.0));
-//         let b = LineSegment(V2(1.0, -1.0), V2(-1.0, 1.0));
-//         assert!(a.intersects(&b));
-//         assert!(b.intersects(&a));
-//     }
-//     #[test]
-//     fn perpendicular_no_overlap() {
-//         let a = LineSegment(V2(0.1, 0.1), V2(1.0, 1.0));
-//         let b = LineSegment(V2(0.0, 0.0), V2(-1.0, 1.0));
-//         assert!(!a.intersects(&b));
-//         assert!(!b.intersects(&a));
-//     }
-//     #[test]
-//     fn endpoints_overlap() {
-//         let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
-//         let b = LineSegment(V2(2.2, -3.3), V2(0.5, 0.5));
-//         assert!(a.intersects(&b));
-//         assert!(b.intersects(&a));
-//     }
-// }
-//
+
+#[cfg(test)]
+mod segments {
+    use super::*;
+
+    #[test]
+    fn collinear_no_overlap() {
+        let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
+        let b = LineSegment(V2(2.0, 2.0), V2(3.0, 3.0));
+        assert!(!a.intersects(&b));
+        assert!(!b.intersects(&a));
+    }
+    #[test]
+    fn collinear_overlap() {
+        let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
+        let b = LineSegment(V2(0.5, 0.5), V2(1.5, 1.5));
+        assert!(a.intersects(&b));
+        assert!(b.intersects(&a));
+    }
+    #[test]
+    fn perpendicular_overlap() {
+        let a = LineSegment(V2(-1.0, -1.0), V2(1.0, 1.0));
+        let b = LineSegment(V2(1.0, -1.0), V2(-1.0, 1.0));
+        assert!(a.intersects(&b));
+        assert!(b.intersects(&a));
+    }
+    #[test]
+    fn perpendicular_no_overlap() {
+        let a = LineSegment(V2(0.1, 0.1), V2(1.0, 1.0));
+        let b = LineSegment(V2(0.0, 0.0), V2(-1.0, 1.0));
+        assert!(!a.intersects(&b));
+        assert!(!b.intersects(&a));
+    }
+    #[test]
+    fn endpoints_overlap() {
+        let a = LineSegment(V2(0.0, 0.0), V2(1.0, 1.0));
+        let b = LineSegment(V2(2.2, -3.3), V2(0.5, 0.5));
+        assert!(a.intersects(&b));
+        assert!(b.intersects(&a));
+    }
+}
+
 // #[cfg(test)]
 // mod outlines {
 //     use super::*;
