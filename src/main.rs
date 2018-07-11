@@ -10,6 +10,7 @@ mod entity;
 mod system;
 mod user_interface;
 mod vector_2d;
+mod game_over;
 
 use entity::Entity;
 use user_interface::UserInterface;
@@ -45,6 +46,7 @@ fn main() {
         let _             = system::control(&controls, &mut entities, &io);
         let out_of_bounds = system::move_position(&momentum, &mut entities, &mut io);
         let collisions    = system::find_collisions(&outline, &mut entities);
+        let _             = system::reflect(&collisions, &mut entities);
         let killed        = system::damage(collisions, out_of_bounds, &mut entities);
         let spawned       = system::shoot(&shooting, &mut entities, &mut io);
 
@@ -63,5 +65,9 @@ fn main() {
 
         system::render(&outline, &mut entities, &mut io);
         io.canvas.present();
+
+        if ! entities.contains_key(&0) {
+            game_over::gameover_loop(&mut io);
+        }
     }
 }

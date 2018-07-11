@@ -75,14 +75,14 @@ impl Momentum {
             theta: PI,
             vel: V2(0.0, 0.0),
             omega: 0.0,
-            mass: 1.0,
+            mass: 10.0,
             edge_behavior: Wall,
             speed_decay: 0.5,
             rotation_decay: 0.2,
         }
     }
 
-    pub fn new_random_edge<R: rand::Rng>(rng: &mut R, speed: f32) -> Momentum {
+    pub fn new_random_edge<R: rand::Rng>(rng: &mut R, speed: f32, mass: f32) -> Momentum {
         let theta = rng.gen_range(0.0, 2.0 * PI);
         let vel = V2(0.0, speed).rotate(theta);
         let pos = if vel.0.abs() < vel.1.abs() {
@@ -101,8 +101,8 @@ impl Momentum {
             pos,
             vel,
             theta,
-            omega: 0.0,
-            mass: 1.0,
+            omega: rng.gen_range(-PI, PI),
+            mass,
             edge_behavior: Pass,
             rotation_decay: 1.0,
             speed_decay: 1.0,

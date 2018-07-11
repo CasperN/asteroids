@@ -6,7 +6,7 @@ use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
 
-const NUM_CELLS: usize = 10;
+const NUM_CELLS: usize = 5;
 
 pub fn find_collisions(outlines: &HashSet<usize>, entities: &mut EMap) -> Vec<(usize, usize)> {
     let outlines: HashMap<usize, Vec<V2>> = outlines
@@ -65,7 +65,7 @@ fn grid_search(outlines: &HashMap<usize, Vec<V2>>) -> Vec<(usize, usize)> {
         let m = j_outline.len();
 
         for ii in 0..n {
-            for jj in ii..m {
+            for jj in 0..m {
                 let i_seg = LineSegment(i_outline[ii], i_outline[(ii + 1) % n]);
                 let j_seg = LineSegment(j_outline[jj], j_outline[(jj + 1) % m]);
 

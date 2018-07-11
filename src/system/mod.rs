@@ -101,14 +101,49 @@ pub fn damage(
     for id in damaged {
         let dead = entities
             .get_mut(&id)
-            .and_then(|e| e.health)
-            .map_or(false, |mut h| {
-                h = h.saturating_sub(1);
-                h == 0
+            .map_or(false, |e| {
+                if let Some(mut h) = e.health {
+                    h = h.saturating_sub(1);
+                    e.health = Some(h);
+                    return h == 0;
+                }
+                false
             });
         if dead {
             dead_entities.push(id);
         }
     }
     dead_entities
+}
+
+pub fn reflect(collisions: &Vec<(usize, usize)>, entities: &mut EMap) {
+    let get_pos_mass = |ents: &EMap, id| ents
+        .get(id)
+        .and_then(|e| e.momentum.as_ref())
+        .map(|m| (m.pos, m.mass, m.vel));
+
+    let impart = |ents: &mut EMap, id, force| ents
+        .get_mut(id)
+        .and_then(|e|
+            e.momentum
+                .as_mut()
+                .map(|m| m.impart(force, 0.0, 1.0))
+        );
+
+    for (id_a,id_b) in collisions.iter() {
+
+        let mut a = get_pos_mass(entities, id_a);
+        let mut b = get_pos_mass(entities, id_b);
+
+        if let (Some((pa, ma, va)), Some((pb, mb, vb))) = (a, b) {
+            // TODO consider velocity to soften collisions
+            let axis = (pa - pb).unit();
+            let momentum_into_collision = vb.dot(axis) * mb - va.dot(axis) * ma;
+
+            let fa = axis.scale(25.0 * momentum_into_collision);
+            let fb = -fa;
+            impart(entities, id_a, fa);
+            impart(entities, id_b, fb);
+        }
+    }
 }

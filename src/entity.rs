@@ -54,14 +54,15 @@ impl Entity {
             .add_momentum(Momentum::new_centered())
             .add_outline(Outline::new_ship())
             .add_shooting(Shooting::new_ship_gun())
-            .add_control(10.0, 25.0)
-            .add_health(10)
+            .add_control(100.0, 250.0)
+            .add_health(3)
     }
     pub fn new_asteroid<R: rand::Rng>(rng: &mut R) -> Entity {
+        let radius = rng.gen_range(3.0, 5.0);
         Entity::new()
-            .add_momentum(Momentum::new_random_edge(rng, 10.0))
-            .add_outline(Outline::new_asteroid(rng, 5.0))
-            .add_health(1)
+            .add_momentum(Momentum::new_random_edge(rng, 10.0, radius * radius))
+            .add_outline(Outline::new_asteroid(rng, radius))
+            .add_health(radius as u32)
     }
     pub fn new_bullet(mc: &Momentum) -> Entity {
         Entity::new()

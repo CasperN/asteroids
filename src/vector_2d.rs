@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use std::ops::{Add, AddAssign, Sub};
+use std::ops::{Add, AddAssign, Sub, Neg};
 
 #[derive(Debug, Clone, Copy)]
 pub struct V2(pub f32, pub f32);
@@ -28,6 +28,16 @@ impl V2 {
     pub fn cross(&self, other: V2) -> f32 {
         self.0 * other.1 - self.1 * other.0
     }
+
+    pub fn unit(&self) -> V2 {
+        self.scale(1.0 / self.len())
+    }
+    pub fn len(&self) -> f32 {
+        self.0 * self.0 + self.1 * self.1
+    }
+    pub fn dot(&self, other: V2) -> f32 {
+        self.0 * other.0 + self.1 * other.1
+    }
 }
 
 impl Add for V2 {
@@ -48,6 +58,14 @@ impl Sub for V2 {
     fn sub(self, other: V2) -> V2 {
         V2(self.0 - other.0, self.1 - other.1)
     }
+}
+
+impl Neg for V2 {
+    type Output = V2;
+    fn neg(self) -> V2 {
+        V2(-self.0, -self.1)
+    }
+
 }
 
 pub fn roots_of_unity(n: usize) -> Vec<V2> {
