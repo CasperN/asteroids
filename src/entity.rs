@@ -58,9 +58,10 @@ impl Entity {
             .add_health(3)
     }
     pub fn new_asteroid<R: rand::Rng>(rng: &mut R) -> Entity {
-        let radius = rng.gen_range(3.0, 5.0);
+        let radius = rng.gen_range(3.0, 10.0);
+        let speed = rng.gen_range(100.0, 200.0) / radius;
         Entity::new()
-            .add_momentum(Momentum::new_random_edge(rng, 10.0, radius * radius))
+            .add_momentum(Momentum::new_random_edge(rng, speed, radius * radius))
             .add_outline(Outline::new_asteroid(rng, radius))
             .add_health(radius as u32)
     }

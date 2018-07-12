@@ -6,7 +6,7 @@ use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
 
-const NUM_CELLS: usize = 5;
+const NUM_CELLS: usize = 8;
 
 pub fn find_collisions(outlines: &HashSet<usize>, entities: &mut EMap) -> Vec<(usize, usize)> {
     let outlines: HashMap<usize, Vec<V2>> = outlines
@@ -174,36 +174,43 @@ mod segments {
 // #[cfg(test)]
 // mod outlines {
 //     use super::*;
+//
+//     fn ids() -> HashSet<usize> {
+//         let i = HashSet::new();
+//         ids.insert(0);
+//         ids.insert(1);
+//     }
+//
 //     #[test]
 //     fn overlapping_squares() {
-//         let outlines = vec![
-//             vec![V2(0.0, 0.0), V2(1.0, 0.0), V2(1.0, 1.0), V2(0.0, 1.0)],
-//             vec![V2(0.5, 0.5), V2(1.5, 0.5), V2(1.5, 1.5), V2(0.5, 1.5)],
-//         ];
-//         assert!(find_collisions(&outlines).len() == 1);
+//         let outlines = HashMap::new();
+//         outlines.insert(0, [V2(0.0, 0.0), V2(1.0, 0.0), V2(1.0, 1.0), V2(0.0, 1.0)]);
+//         outlines.insert(1, [V2(0.5, 0.5), V2(1.5, 0.5), V2(1.5, 1.5), V2(0.5, 1.5)]);
+//
+//         assert!(find_collisions(ids(), &outlines).len() == 1);
 //     }
 //     #[test]
 //     fn non_overlapping_squares() {
-//         let outlines = vec![
-//             vec![V2(0.0, 0.0), V2(1.0, 0.0), V2(1.0, 1.0), V2(0.0, 1.0)],
-//             vec![V2(1.5, 1.5), V2(2.5, 1.5), V2(2.5, 2.5), V2(1.5, 2.5)],
-//         ];
-//         assert!(find_collisions(&outlines).len() == 0);
+//         let outlines = HashMap::new();
+//         outlines.insert(0, [V2(0.0, 0.0), V2(1.0, 0.0), V2(1.0, 1.0), V2(0.0, 1.0)]);
+//         outlines.insert(1, [V2(1.5, 1.5), V2(2.5, 1.5), V2(2.5, 2.5), V2(1.5, 2.5)]);
+//
+//         assert!(find_collisions(ids(), &outlines).len() == 0);
 //     }
 //     #[test]
 //     fn overlapping_triangle_and_line() {
-//         let outlines = vec![
-//             vec![V2(1.0, 2.0), V2(3.0, 2.0)],
-//             vec![V2(2.0, 1.0), V2(2.0, 3.0), V2(2.5, 3.0)]
-//         ];
-//         assert!(find_collisions(&outlines).len() == 1);
+//         let outlines = HashMap::new();
+//         outlines.insert(0, [V2(1.0, 2.0), V2(3.0, 2.0)]);
+//         outlines.insert(1, [V2(2.0, 1.0), V2(2.0, 3.0), V2(2.5, 3.0)]);
+//
+//         assert!(find_collisions(ids(), &outlines).len() == 1);
 //     }
 //     #[test]
 //     fn non_overlapping_triangle_and_line() {
-//         let outlines = vec![
-//             vec![V2(10.0, 20.0), V2(30.0, 20.0)],
-//             vec![V2(2.0, 1.0), V2(2.0, 3.0), V2(2.5, 3.0)]
-//         ];
-//         assert!(find_collisions(&outlines).len() == 0);
+//         let outlines = HashMap::new();
+//         outlines.insert(0, [V2(10.0, 20.0), V2(30.0, 20.0)]);
+//         outlines.insert(1, [V2(2.0, 1.0), V2(2.0, 3.0), V2(2.5, 3.0)]);
+//
+//         assert!(find_collisions(ids(), &outlines).len() == 0);
 //     }
 // }
