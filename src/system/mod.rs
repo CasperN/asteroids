@@ -130,12 +130,12 @@ pub fn reflect(collisions: &Vec<(usize, usize)>, entities: &mut EMap) {
         let mut a = get_pos_mass(entities, id_a);
         let mut b = get_pos_mass(entities, id_b);
 
-        if let (Some((pa, ma, va)), Some((pb, mb, vb))) = (a, b) {
+        if let (Some((pa, ma, _va)), Some((pb, mb, _vb))) = (a, b) {
             // TODO consider velocity to soften collisions
             let axis = (pa - pb).unit();
-            let momentum_into_collision = vb.dot(axis) * mb - va.dot(axis) * ma;
+            // let momentum_into_collision = vb.dot(axis) * mb - va.dot(axis) * ma;
 
-            let fa = axis.scale(25.0 * momentum_into_collision);
+            let fa = axis.scale(25.0 * (ma + mb)); //* momentum_into_collision);
             let fb = -fa;
             impart(entities, id_a, fa);
             impart(entities, id_b, fb);

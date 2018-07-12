@@ -35,6 +35,7 @@ impl V2 {
     pub fn len(&self) -> f32 {
         self.0 * self.0 + self.1 * self.1
     }
+    #[allow(dead_code)]
     pub fn dot(&self, other: V2) -> f32 {
         self.0 * other.0 + self.1 * other.1
     }

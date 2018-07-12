@@ -1,7 +1,8 @@
 #![feature(euclidean_division)]
 
 use std::collections::{HashMap, HashSet};
-use std::{thread, time};
+use std::thread;
+use std::time::{Duration, Instant};
 
 extern crate sdl2;
 
@@ -19,6 +20,10 @@ const X_LEN: f32 = 100.0;
 const Y_LEN: f32 = 100.0;
 
 fn main() {
+    let twenty_millis = Duration::from_millis(20);
+    let half_sec = Duration::from_millis(300);
+    let mut last_paused = Instant::now();
+
     let mut io = UserInterface::new();
     let mut entities = HashMap::new();
 
@@ -35,10 +40,15 @@ fn main() {
 
     'game: loop {
         io.parse_events();
-        let twenty_millis = time::Duration::from_millis(20);
+
         thread::sleep(twenty_millis);
         if io.user_input.quit {
             break 'game;
+        }
+        if io.user_input.pause && last_paused.elapsed() > half_sec {
+            game_over::loop_text(&mut io, "Paused.", true);
+            io.parse_events();
+            last_paused = Instant::now();
         }
         io.draw_background();
 
@@ -67,7 +77,7 @@ fn main() {
         io.canvas.present();
 
         if !entities.contains_key(&0) {
-            game_over::gameover_loop(&mut io);
+            game_over::loop_text(&mut io, "Game Over.", false);
         }
     }
 }
