@@ -14,7 +14,7 @@ pub struct Entity {
 }
 
 impl Entity {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Entity {
             momentum: None,
             outline: None,
@@ -23,24 +23,24 @@ impl Entity {
             control: None,
         }
     }
-    fn add_momentum(mut self, m: Momentum) -> Self {
+    pub fn add_momentum(mut self, m: Momentum) -> Self {
         self.momentum = Some(Box::new(m));
         self
     }
-    fn add_outline(mut self, o: Outline) -> Self {
+    pub fn add_outline(mut self, o: Outline) -> Self {
         self.outline = Some(Box::new(o));
         self
     }
-    fn add_shooting(mut self, s: Shooting) -> Self {
+    pub fn add_shooting(mut self, s: Shooting) -> Self {
         self.shooting = Some(Box::new(s));
         self
     }
-    fn add_control(mut self, torque: f32, thrust: f32) -> Self {
+    pub fn add_control(mut self, torque: f32, thrust: f32) -> Self {
         let c = Control { torque, thrust };
         self.control = Some(Box::new(c));
         self
     }
-    fn add_health(mut self, h: u32) -> Self {
+    pub fn add_health(mut self, h: u32) -> Self {
         self.health = Some(h);
         self
     }

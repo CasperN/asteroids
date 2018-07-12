@@ -70,4 +70,10 @@ impl Outline {
             color: Color::RGB(255, 255, 255),
         }
     }
+    pub fn new(relative_outline: Vec<V2>, color: Color) -> Outline {
+        Outline {
+            relative_outline,
+            color,
+        }
+    }
 }

@@ -121,4 +121,16 @@ impl Momentum {
             speed_decay: 1.0,
         }
     }
+    pub fn new_zero() -> Momentum {
+        Momentum {
+            pos: V2(0.0, 0.0),
+            vel: V2(0.0, 0.0),
+            theta: 0.0,
+            omega: 0.0,
+            mass: 0.0,
+            edge_behavior: Pass,
+            rotation_decay: 0.0,
+            speed_decay: 0.0,
+        }
+    }
 }

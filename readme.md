@@ -44,15 +44,15 @@ misc
 * Asteroid spawning / de-spawning
 * Projectiles
 * Collision detection system
-
-# TODO Now
+* Impact physics
 * Toggle whether things wrap around the border or stick to it
 * Health system
-* Asteroid Breaking
-* Impact physics
 
+# TODO Now
+* Asteroid Breaking
+* scores
 
 # TODO Far future
+* AI other ships (transition to bullet hell)
 * save/load
-* scores
 * remap control
