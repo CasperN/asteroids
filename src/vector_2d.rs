@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use std::ops::{Add, AddAssign, Sub, Neg};
+use std::ops::{Add, AddAssign, Neg, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct V2(pub f32, pub f32);
@@ -65,7 +65,6 @@ impl Neg for V2 {
     fn neg(self) -> V2 {
         V2(-self.0, -self.1)
     }
-
 }
 
 pub fn roots_of_unity(n: usize) -> Vec<V2> {

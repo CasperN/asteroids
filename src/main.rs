@@ -7,10 +7,10 @@ extern crate sdl2;
 
 mod component;
 mod entity;
+mod game_over;
 mod system;
 mod user_interface;
 mod vector_2d;
-mod game_over;
 
 use entity::Entity;
 use user_interface::UserInterface;
@@ -43,12 +43,12 @@ fn main() {
         io.draw_background();
 
         // Update systems... TODO give parts of IO, not the whole controller
-        let _             = system::control(&controls, &mut entities, &io);
+        let _ = system::control(&controls, &mut entities, &io);
         let out_of_bounds = system::move_position(&momentum, &mut entities, &mut io);
-        let collisions    = system::find_collisions(&outline, &mut entities);
-        let _             = system::reflect(&collisions, &mut entities);
-        let killed        = system::damage(collisions, out_of_bounds, &mut entities);
-        let spawned       = system::shoot(&shooting, &mut entities, &mut io);
+        let collisions = system::find_collisions(&outline, &mut entities);
+        let _ = system::reflect(&collisions, &mut entities);
+        let killed = system::damage(collisions, out_of_bounds, &mut entities);
+        let spawned = system::shoot(&shooting, &mut entities, &mut io);
 
         for s in spawned.into_iter() {
             entities.insert(entity_num, s);
@@ -66,7 +66,7 @@ fn main() {
         system::render(&outline, &mut entities, &mut io);
         io.canvas.present();
 
-        if ! entities.contains_key(&0) {
+        if !entities.contains_key(&0) {
             game_over::gameover_loop(&mut io);
         }
     }

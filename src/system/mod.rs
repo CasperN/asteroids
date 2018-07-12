@@ -99,16 +99,14 @@ pub fn damage(
         .chain(out_of_bounds.into_iter());
 
     for id in damaged {
-        let dead = entities
-            .get_mut(&id)
-            .map_or(false, |e| {
-                if let Some(mut h) = e.health {
-                    h = h.saturating_sub(1);
-                    e.health = Some(h);
-                    return h == 0;
-                }
-                false
-            });
+        let dead = entities.get_mut(&id).map_or(false, |e| {
+            if let Some(mut h) = e.health {
+                h = h.saturating_sub(1);
+                e.health = Some(h);
+                return h == 0;
+            }
+            false
+        });
         if dead {
             dead_entities.push(id);
         }
@@ -117,21 +115,18 @@ pub fn damage(
 }
 
 pub fn reflect(collisions: &Vec<(usize, usize)>, entities: &mut EMap) {
-    let get_pos_mass = |ents: &EMap, id| ents
-        .get(id)
-        .and_then(|e| e.momentum.as_ref())
-        .map(|m| (m.pos, m.mass, m.vel));
+    let get_pos_mass = |ents: &EMap, id| {
+        ents.get(id)
+            .and_then(|e| e.momentum.as_ref())
+            .map(|m| (m.pos, m.mass, m.vel))
+    };
 
-    let impart = |ents: &mut EMap, id, force| ents
-        .get_mut(id)
-        .and_then(|e|
-            e.momentum
-                .as_mut()
-                .map(|m| m.impart(force, 0.0, 1.0))
-        );
+    let impart = |ents: &mut EMap, id, force| {
+        ents.get_mut(id)
+            .and_then(|e| e.momentum.as_mut().map(|m| m.impart(force, 0.0, 1.0)))
+    };
 
-    for (id_a,id_b) in collisions.iter() {
-
+    for (id_a, id_b) in collisions.iter() {
         let mut a = get_pos_mass(entities, id_a);
         let mut b = get_pos_mass(entities, id_b);
 
