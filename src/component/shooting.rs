@@ -1,11 +1,12 @@
 use std::time::{Duration, Instant};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Projectile {
     Bullet,
     Asteroid,
 }
 
+#[derive(Debug)]
 pub struct Shooting {
     pub is_firing: bool,
     fire_rate: Duration,

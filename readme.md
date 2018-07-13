@@ -1,39 +1,3 @@
-
-# Architecture
-```
-Trait / Components
-    Momentum / Inertia
-    Controllable / Control
-    Outlineable / Outline
-        get_outline **
-        intersection
-        render
-Entities
-    Asteroid
-    Ship (Control, Outline, Inertia)
-    Bullet (Outline, Inertia)
-
-Systems
-    Control   :: Ship -> ()
-    Rendering :: [outlines] -> ()
-    Collision :: [outlines] -> [(EntityID, EntityID)]
-    Shooting :: [Ship, AsteroidSpawner] -> new projectile
-
-
-stateFrames (owns entities and lower stateFrames)
-    stateFrame trait
-        enter( &mut event_parser, &mut canvas )
-
-    menu loop (main starts here)
-    game loop (spawns asteroids too)
-    pause loop (press p to unpause)
-
-misc
-    event_parser (sdl2 events to control struct)
-        holds event pump
-        key map (sdl2 event to internal control interpretation)
-        get_control_struct(&self)
-```
 # Done so far
 * Control system
 * Momentum system
@@ -47,12 +11,20 @@ misc
 * Impact physics
 * Toggle whether things wrap around the border or stick to it
 * Health system
+* Pause and over screen
+* Shrapnel System - breaking into asteroids and outlines
+* Sleep until instant of next frame (as opposed to for fixed duration)
 
 # TODO Now
-* Asteroid Breaking
-* scores
+* Collect and display stats (health, shots fired/hit)
+* Level system
+* AI System -> other ships -> transition to bullet hell
 
 # TODO Far future
-* AI other ships (transition to bullet hell)
+* Refactor
+    * EntityManager (holds entity_map and component owner sets)
+    * Update systems to take specific parts of IO, rather than whole controller
+* Mouse based aiming and absolute controls
+* Expandable ship (attaching other weapons)
 * save/load
 * remap control

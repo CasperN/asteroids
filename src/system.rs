@@ -1,6 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
-// use component::*;
+extern crate rand;
+
+use component::*;
 use entity::Entity;
 use user_interface::UserInterface;
 
@@ -11,21 +13,15 @@ type EMap = HashMap<usize, Entity>;
 
 pub fn control(controllables: &[usize], entities: &mut EMap, io: &UserInterface) {
     for id in controllables.iter() {
-        entities
-            .get_mut(id)
-            .and_then(|e| {
-                if let Some(m) = e.momentum.as_mut() {
-                    if let Some(s) = e.shooting.as_mut() {
-                        if let Some(c) = e.control.as_mut() {
-                            return Some((c, m, s));
-                        }
+        entities.get_mut(id).map(|e| {
+            if let Some(m) = e.momentum.as_mut() {
+                if let Some(s) = e.shooting.as_mut() {
+                    if let Some(c) = e.control.as_mut() {
+                        c.update(&io.user_input, m, s);
                     }
                 }
-                None
-            })
-            .map(|(c, m, s)| {
-                c.update(&io.user_input, m, s);
-            });
+            }
+        });
     }
 }
 
@@ -87,16 +83,11 @@ pub fn render(outlines: &HashSet<usize>, entities: &mut EMap, io: &mut UserInter
     }
 }
 
-pub fn damage(
-    collisions: Vec<(usize, usize)>,
-    out_of_bounds: Vec<usize>,
-    entities: &mut EMap,
-) -> Vec<usize> {
+pub fn damage(collisions: Vec<(usize, usize)>, entities: &mut EMap) -> Vec<usize> {
     let mut dead_entities = Vec::new();
     let damaged = collisions
         .into_iter()
-        .flat_map(|(a, b)| vec![a, b].into_iter())
-        .chain(out_of_bounds.into_iter());
+        .flat_map(|(a, b)| vec![a, b].into_iter());
 
     for id in damaged {
         let dead = entities.get_mut(&id).map_or(false, |e| {
@@ -141,4 +132,27 @@ pub fn reflect(collisions: &Vec<(usize, usize)>, entities: &mut EMap) {
             impart(entities, id_b, fb);
         }
     }
+}
+
+pub fn shrapnel<R: rand::Rng>(
+    killed: &Vec<usize>,
+    entities: &mut EMap,
+    rng: &mut R,
+) -> Vec<Entity> {
+    let mut new_entities = Vec::new();
+    for id in killed.iter() {
+        let ents = entities.get(id).and_then(|e| {
+            let mc = e.momentum.as_ref();
+            let oc = e.outline.as_ref();
+            let sc = e.shrapnel.as_ref();
+            if let (Some(m), Some(o), Some(s)) = (mc, oc, sc) {
+                return Some(shatter(s, m, o, rng));
+            }
+            None
+        });
+        if let Some(mut es) = ents {
+            new_entities.append(&mut es);
+        }
+    }
+    new_entities
 }

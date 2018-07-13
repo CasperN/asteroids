@@ -7,6 +7,7 @@ use X_LEN;
 use Y_LEN;
 
 #[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
 pub enum EdgeBehaviour {
     Pass,
     PacMan,
@@ -15,6 +16,7 @@ pub enum EdgeBehaviour {
 
 use self::EdgeBehaviour::*;
 
+#[derive(Debug, Clone)]
 pub struct Momentum {
     pub pos: V2,
     pub vel: V2,
@@ -121,6 +123,7 @@ impl Momentum {
             speed_decay: 1.0,
         }
     }
+    #[cfg(test)]
     pub fn new_zero() -> Momentum {
         Momentum {
             pos: V2(0.0, 0.0),

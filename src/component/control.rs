@@ -2,6 +2,7 @@ use component::{Momentum, Shooting};
 use user_interface::UserInput;
 use vector_2d::V2;
 
+#[derive(Debug)]
 pub struct Control {
     pub torque: f32,
     pub thrust: f32,

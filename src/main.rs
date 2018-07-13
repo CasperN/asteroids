@@ -1,7 +1,11 @@
 #![feature(euclidean_division)]
+#![feature(non_modrs_mods)]
+//
+// #![feature(alloc_system)]
+// extern crate alloc_system;
 
 use std::collections::{HashMap, HashSet};
-use std::thread;
+// use std::thread;
 use std::time::{Duration, Instant};
 
 extern crate sdl2;
@@ -20,9 +24,11 @@ const X_LEN: f32 = 100.0;
 const Y_LEN: f32 = 100.0;
 
 fn main() {
-    let twenty_millis = Duration::from_millis(20);
+    // let twenty_millis = Duration::from_millis(20);
     let half_sec = Duration::from_millis(300);
     let mut last_paused = Instant::now();
+    // let mut next_frame = Instant::now() + twenty_millis;
+    let mut death_time = None;
 
     let mut io = UserInterface::new();
     let mut entities = HashMap::new();
@@ -40,8 +46,8 @@ fn main() {
 
     'game: loop {
         io.parse_events();
+        io.sleep_until_next_frame();
 
-        thread::sleep(twenty_millis);
         if io.user_input.quit {
             break 'game;
         }
@@ -52,13 +58,13 @@ fn main() {
         }
         io.draw_background();
 
-        // Update systems... TODO give parts of IO, not the whole controller
         let _ = system::control(&controls, &mut entities, &io);
         let out_of_bounds = system::move_position(&momentum, &mut entities, &mut io);
         let collisions = system::find_collisions(&outline, &mut entities);
         let _ = system::reflect(&collisions, &mut entities);
-        let killed = system::damage(collisions, out_of_bounds, &mut entities);
-        let spawned = system::shoot(&shooting, &mut entities, &mut io);
+        let killed = system::damage(collisions, &mut entities);
+        let mut spawned = system::shoot(&shooting, &mut entities, &mut io);
+        spawned.append(&mut system::shrapnel(&killed, &mut entities, &mut io.rng));
 
         for s in spawned.into_iter() {
             entities.insert(entity_num, s);
@@ -67,7 +73,7 @@ fn main() {
             entity_num += 1;
         }
 
-        for k in killed.iter() {
+        for k in killed.into_iter().chain(out_of_bounds.into_iter()) {
             entities.remove(&k);
             momentum.remove(&k);
             outline.remove(&k);
@@ -76,8 +82,13 @@ fn main() {
         system::render(&outline, &mut entities, &mut io);
         io.canvas.present();
 
-        if !entities.contains_key(&0) {
-            game_over::loop_text(&mut io, "Game Over.", false);
+        if !entities.contains_key(&0) && death_time == None {
+            death_time = Some(Instant::now());
+        }
+        if let Some(t) = death_time {
+            if t.elapsed() > Duration::from_millis(5000) {
+                game_over::loop_text(&mut io, "Game Over.", false);
+            }
         }
     }
 }

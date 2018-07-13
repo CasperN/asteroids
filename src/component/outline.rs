@@ -11,12 +11,21 @@ use vector_2d::{roots_of_unity, V2};
 use X_LEN;
 use Y_LEN;
 
+#[derive(Debug)]
 pub struct Outline {
     relative_outline: Vec<V2>,
     color: Color,
 }
 
 impl Outline {
+    pub fn get_relative_outline(&self) -> &Vec<V2> {
+        &self.relative_outline
+    }
+
+    pub fn color(&self) -> Color {
+        self.color
+    }
+
     pub fn compute_outline(&self, mc: &Momentum) -> Vec<V2> {
         self.relative_outline
             .iter()
@@ -66,7 +75,7 @@ impl Outline {
 
     pub fn new_bullet() -> Outline {
         Outline {
-            relative_outline: vec![V2(0.0, 1.0), V2(0.0, -1.0)],
+            relative_outline: vec![V2(0.0, 1.0), V2(0.0, 0.0)],
             color: Color::RGB(255, 255, 255),
         }
     }

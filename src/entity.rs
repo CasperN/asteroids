@@ -5,12 +5,14 @@ extern crate rand;
 use component::*;
 use vector_2d::V2;
 
+#[derive(Debug)]
 pub struct Entity {
     pub momentum: Option<Box<Momentum>>,
     pub outline: Option<Box<Outline>>,
     pub health: Option<u32>,
     pub shooting: Option<Box<Shooting>>,
     pub control: Option<Box<Control>>,
+    pub shrapnel: Option<Shrapnel>,
 }
 
 impl Entity {
@@ -21,6 +23,7 @@ impl Entity {
             health: None,
             shooting: None,
             control: None,
+            shrapnel: None,
         }
     }
     pub fn add_momentum(mut self, m: Momentum) -> Self {
@@ -44,6 +47,10 @@ impl Entity {
         self.health = Some(h);
         self
     }
+    pub fn add_shrapnel(mut self, s: Shrapnel) -> Self {
+        self.shrapnel = Some(s);
+        self
+    }
 
     pub fn new_asteroid_spawner() -> Entity {
         Entity::new().add_shooting(Shooting::new_asteroid_spawner())
@@ -55,19 +62,28 @@ impl Entity {
             .add_outline(Outline::new_ship())
             .add_shooting(Shooting::new_ship_gun())
             .add_control(100.0, 250.0)
-            .add_health(3)
+            .add_health(10)
+            .add_shrapnel(Shrapnel::Shards)
     }
     pub fn new_asteroid<R: rand::Rng>(rng: &mut R) -> Entity {
-        let radius = rng.gen_range(3.0, 10.0);
-        let speed = rng.gen_range(100.0, 200.0) / radius;
-        Entity::new()
-            .add_momentum(Momentum::new_random_edge(rng, speed, radius * radius))
+        let radius = rng.gen_range(5.0, 10.0);
+        let speed = rng.gen_range(50.0, 100.0) / radius;
+        let mass = radius * radius;
+
+        let e = Entity::new()
+            .add_momentum(Momentum::new_random_edge(rng, speed, mass))
             .add_outline(Outline::new_asteroid(rng, radius))
-            .add_health(radius as u32)
+            .add_health(radius as u32);
+
+        if radius > 7.5 {
+            e.add_shrapnel(Shrapnel::Asteroids)
+        } else {
+            e.add_shrapnel(Shrapnel::Shards)
+        }
     }
     pub fn new_bullet(mc: &Momentum) -> Entity {
         Entity::new()
-            .add_momentum(mc.new_relative(V2(0.0, 3.0), V2(0.0, 50.0), 1.0))
+            .add_momentum(mc.new_relative(V2(0.0, 2.5), V2(0.0, 50.0), 1.0))
             .add_outline(Outline::new_bullet())
             .add_health(1)
     }

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::time;
+use std::thread;
+use std::time::{Duration, Instant};
 
 extern crate sdl2;
 use sdl2::event::Event;
@@ -9,6 +10,8 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 
 extern crate rand;
+
+const TARGET_FPS: u64 = 60;
 
 enum Controls {
     Up,
@@ -27,7 +30,7 @@ pub struct UserInput {
     pub pause: bool,
     pub quit: bool,
     pub shoot: bool,
-    pub update_time: time::Instant,
+    pub update_time: Instant,
 }
 
 impl UserInput {
@@ -45,6 +48,7 @@ pub struct UserInterface {
     pub rng: rand::rngs::ThreadRng,
     map: HashMap<Keycode, (Controls, bool)>,
     event_pump: sdl2::EventPump,
+    next_frame: Instant,
 }
 
 impl UserInterface {
@@ -84,7 +88,7 @@ impl UserInterface {
             quit: false,
             pause: false,
             shoot: false,
-            update_time: time::Instant::now(),
+            update_time: Instant::now(),
         };
 
         let event_pump = sdl_context.event_pump().unwrap();
@@ -95,7 +99,16 @@ impl UserInterface {
             user_input,
             event_pump,
             rng: rand::thread_rng(),
+            next_frame: Instant::now() + Duration::from_millis(1000 / TARGET_FPS),
         }
+    }
+
+    pub fn sleep_until_next_frame(&mut self) {
+        let now = Instant::now();
+        if self.next_frame > now {
+            thread::sleep(self.next_frame - now);
+        }
+        self.next_frame = now + Duration::from_millis(1000 / TARGET_FPS);
     }
 
     pub fn parse_events(&mut self) {
@@ -138,7 +151,7 @@ impl UserInterface {
                 Controls::Shoot => self.user_input.shoot = *pressed,
             }
         }
-        self.user_input.update_time = time::Instant::now();
+        self.user_input.update_time = Instant::now();
     }
 
     pub fn draw_background(&mut self) {
