@@ -49,9 +49,7 @@ pub struct UserInterface {
 }
 
 impl UserInterface {
-
     pub fn new(sdl_context: &Sdl) -> Self {
-
         let mut map = HashMap::new();
         map.insert(Keycode::W, (Controls::Up, false));
         map.insert(Keycode::S, (Controls::Down, false));

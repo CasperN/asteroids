@@ -61,7 +61,9 @@ impl<'a> Screen<'a> {
             .create_texture_from_surface(&surface)
             .unwrap();
 
-        self.canvas.copy(&texture, None, Some(self.top_left)).unwrap();
+        self.canvas
+            .copy(&texture, None, Some(self.top_left))
+            .unwrap();
     }
 
     pub fn draw_big_centered(&mut self, text: &str) {

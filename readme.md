@@ -14,9 +14,9 @@
 * Pause and over screen
 * Shrapnel System - breaking into asteroids and outlines
 * Sleep until instant of next frame (as opposed to for fixed duration)
+* Heads up display (at least for health)
 
 # TODO Now
-* Collect and display stats (health, shots fired/hit)
 * Level system
 * AI System -> other ships -> transition to bullet hell
 

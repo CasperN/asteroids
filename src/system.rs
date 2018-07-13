@@ -3,8 +3,8 @@ use std::collections::{HashMap, HashSet};
 extern crate rand;
 
 use entity::Entity;
-use user_interface::UserInterface;
 use hud::Screen;
+use user_interface::UserInterface;
 
 mod collision;
 pub use self::collision::find_collisions;
