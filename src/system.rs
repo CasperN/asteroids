@@ -2,9 +2,9 @@ use std::collections::{HashMap, HashSet};
 
 extern crate rand;
 
-use component::*;
 use entity::Entity;
 use user_interface::UserInterface;
+use hud::Screen;
 
 mod collision;
 pub use self::collision::find_collisions;
@@ -71,14 +71,14 @@ pub fn shoot(shooters: &[usize], entities: &mut EMap, io: &mut UserInterface) ->
     new_entities
 }
 
-pub fn render(outlines: &HashSet<usize>, entities: &mut EMap, io: &mut UserInterface) {
+pub fn render(outlines: &HashSet<usize>, entities: &mut EMap, screen: &mut Screen) {
     for id in outlines.iter() {
         let ent = entities.get(id);
         let m = ent.and_then(|e| e.momentum.as_ref());
         let o = ent.and_then(|e| e.outline.as_ref());
 
         if let (Some(o), Some(m)) = (o, m) {
-            o.render(&m, &mut io.canvas);
+            o.render(&m, &mut screen.canvas);
         }
     }
 }
@@ -146,7 +146,7 @@ pub fn shrapnel<R: rand::Rng>(
             let oc = e.outline.as_ref();
             let sc = e.shrapnel.as_ref();
             if let (Some(m), Some(o), Some(s)) = (mc, oc, sc) {
-                return Some(shatter(s, m, o, rng));
+                return Some(s.shatter(m, o, rng));
             }
             None
         });

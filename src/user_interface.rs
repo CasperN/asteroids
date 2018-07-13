@@ -5,9 +5,7 @@ use std::time::{Duration, Instant};
 extern crate sdl2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
+use sdl2::Sdl;
 
 extern crate rand;
 
@@ -43,7 +41,6 @@ impl UserInput {
 }
 
 pub struct UserInterface {
-    pub canvas: Canvas<Window>,
     pub user_input: UserInput,
     pub rng: rand::rngs::ThreadRng,
     map: HashMap<Keycode, (Controls, bool)>,
@@ -52,26 +49,8 @@ pub struct UserInterface {
 }
 
 impl UserInterface {
-    pub const SCREEN_WIDTH: u32 = 800;
-    pub const SCREEN_HEIGHT: u32 = 800;
 
-    const BACKGROUND_COLOR: Color = Color {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 255,
-    };
-
-    pub fn new() -> Self {
-        let sdl_context = sdl2::init().unwrap();
-        let video_subsystem = sdl_context.video().unwrap();
-        let window = video_subsystem
-            .window("rust-sdl2 demo", Self::SCREEN_WIDTH, Self::SCREEN_HEIGHT)
-            .position_centered()
-            .build()
-            .unwrap();
-
-        let canvas = window.into_canvas().build().unwrap();
+    pub fn new(sdl_context: &Sdl) -> Self {
 
         let mut map = HashMap::new();
         map.insert(Keycode::W, (Controls::Up, false));
@@ -95,7 +74,6 @@ impl UserInterface {
 
         UserInterface {
             map,
-            canvas,
             user_input,
             event_pump,
             rng: rand::thread_rng(),
@@ -152,10 +130,5 @@ impl UserInterface {
             }
         }
         self.user_input.update_time = Instant::now();
-    }
-
-    pub fn draw_background(&mut self) {
-        self.canvas.set_draw_color(Self::BACKGROUND_COLOR);
-        self.canvas.clear();
     }
 }

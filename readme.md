@@ -24,6 +24,7 @@
 * Refactor
     * EntityManager (holds entity_map and component owner sets)
     * Update systems to take specific parts of IO, rather than whole controller
+    * Spawn projectiles in `impl Projectile` rather than in entity
 * Mouse based aiming and absolute controls
 * Expandable ship (attaching other weapons)
 * save/load
