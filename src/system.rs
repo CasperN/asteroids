@@ -48,25 +48,16 @@ pub fn move_position(
 }
 
 pub fn shoot(shooters: &[usize], entities: &mut EMap, io: &mut UserInterface) -> Vec<Entity> {
-    use component::Projectile::*;
-
     let mut new_entities = Vec::new();
 
     for id in shooters.iter() {
-        let new_projectile = entities
-            .get_mut(id)
-            .and_then(|e| e.shooting.as_mut())
-            .and_then(|s| s.try_fire());
-
-        match new_projectile {
-            Some(Asteroid) => new_entities.push(Entity::new_asteroid(&mut io.rng)),
-            Some(Bullet) => {
-                if let Some(m) = entities.get(id).and_then(|e| e.momentum.as_ref()) {
-                    new_entities.push(Entity::new_bullet(&m))
+        entities.get_mut(id).map(|e| {
+            if let Some(s) = e.shooting.as_mut() {
+                if let Some(b) = s.try_fire() {
+                    new_entities.push(b.spawn_entity(&mut io.rng, &e.momentum));
                 }
             }
-            None => (),
-        }
+        });
     }
     new_entities
 }
