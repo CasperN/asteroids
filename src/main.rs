@@ -19,6 +19,7 @@ mod vector_2d;
 
 use entity::Entity;
 use hud::Screen;
+use system::*;
 use user_interface::UserInterface;
 
 const FONT_PATH: &'static str = "/Users/casperneo/Desktop/font.ttf";
@@ -30,9 +31,11 @@ fn main() {
     let ttf_context = sdl2::ttf::init().unwrap();
     let mut screen = hud::Screen::new(&sdl_context, &ttf_context, FONT_PATH);
     let mut io = UserInterface::new(&sdl_context);
+    let mut next_level = Instant::now() + Duration::from_secs(10);
 
     let mut last_paused = Instant::now();
     let mut death_time = None;
+    let mut level = 1;
 
     let mut entities = HashMap::new();
     entities.insert(0, Entity::new_ship());
@@ -54,22 +57,23 @@ fn main() {
             break 'game;
         }
         if io.user_input.pause && last_paused.elapsed() > Duration::from_millis(300) {
-            loop_text(&mut io, "Paused.", &mut screen, true);
+            loop_text(&mut screen, &mut io, "Paused.", true);
             io.parse_events();
             last_paused = Instant::now();
         }
         screen.draw_background();
 
-        let _ = system::control(&controls, &mut entities, &io);
+        control(&controls, &mut entities, &io);
 
-        let out_of_bounds = system::move_position(&momentum, &mut entities, &mut io);
-        let collisions = system::find_collisions(&outline, &mut entities);
+        let out_of_bounds = move_position(&momentum, &mut entities, &mut io);
+        let collisions = find_collisions(&outline, &mut entities);
 
-        let _ = system::reflect(&collisions, &mut entities);
-        let killed = system::damage(collisions, &mut entities);
+        reflect(&collisions, &mut entities);
 
-        let projectiles = system::shoot(&shooting, &mut entities, &mut io);
-        let shrapnel = system::shrapnel(&killed, &mut entities, &mut io.rng);
+        let killed = damage(collisions, &mut entities);
+
+        let projectiles = shoot(&shooting, &mut entities, &mut io);
+        let shrapnel = shrapnel(&killed, &mut entities, &mut io.rng);
 
         for s in projectiles.into_iter().chain(shrapnel.into_iter()) {
             entities.insert(entity_num, s);
@@ -84,13 +88,13 @@ fn main() {
             outline.remove(&k);
         }
 
-        system::render(&outline, &mut entities, &mut screen);
+        render(&outline, &mut entities, &mut screen);
 
-        // Render Health
         entities
             .get(&0)
             .and_then(|e| e.health)
             .map(|h| screen.draw_health(h));
+        screen.draw_level(level);
 
         screen.canvas.present();
 
@@ -99,13 +103,22 @@ fn main() {
         }
         if let Some(t) = death_time {
             if t.elapsed() > Duration::from_millis(5000) {
-                loop_text(&mut io, "Game Over.", &mut screen, false);
+                loop_text(&mut screen, &mut io, "Game Over.", false);
             }
+        }
+
+        if Instant::now() > next_level {
+            next_level += Duration::from_secs(10);
+            level += 1;
+            entities
+                .get_mut(&1)
+                .and_then(|e| e.shooting.as_mut())
+                .map(|s| s.projectile.level_up());
         }
     }
 }
 
-fn loop_text(io: &mut UserInterface, text: &str, screen: &mut Screen, escape: bool) {
+fn loop_text(screen: &mut Screen, io: &mut UserInterface, text: &str, escape: bool) {
     screen.draw_background();
     screen.draw_big_centered(text);
     screen.canvas.present();

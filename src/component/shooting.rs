@@ -29,6 +29,24 @@ impl Projectile {
             } => new_asteroid(rng, speed_range, mass_range),
         }
     }
+    pub fn level_up(&mut self) {
+        if let Asteroid {
+            mut speed_range,
+            mut mass_range,
+        } = self
+        {
+            speed_range.0 *= 1.1;
+            speed_range.1 *= 1.1;
+            mass_range.0 *= 1.1;
+            mass_range.1 *= 1.1;
+            *self = Asteroid {
+                speed_range,
+                mass_range,
+            };
+        } else {
+            println!("Warning... tried to level up non asteroid shooter");
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -36,7 +54,7 @@ pub struct Shooting {
     pub is_firing: bool,
     fire_rate: Duration,
     last_fired: Instant,
-    projectile: Projectile,
+    pub projectile: Projectile,
 }
 
 impl Shooting {

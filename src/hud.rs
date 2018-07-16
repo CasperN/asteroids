@@ -15,15 +15,21 @@ pub struct Screen<'a> {
     pub canvas: Canvas<Window>,
     font: Font<'a, 'static>,
     top_left: Rect,
+    top_right: Rect,
 }
 
 impl<'a> Screen<'a> {
-    pub const SCREEN_WIDTH: u32 = 800;
-    pub const SCREEN_HEIGHT: u32 = 800;
-
+    const SCREEN_WIDTH: u32 = 800;
+    const SCREEN_HEIGHT: u32 = 800;
     const BACKGROUND_COLOR: Color = Color {
         r: 0,
         g: 0,
+        b: 0,
+        a: 255,
+    };
+    const TEXT_COL: Color = Color {
+        r: 255,
+        g: 255,
         b: 0,
         a: 255,
     };
@@ -42,6 +48,7 @@ impl<'a> Screen<'a> {
         Screen {
             font,
             top_left: Rect::new(10, 10, 100, 20),
+            top_right: Rect::new(690, 10, 100, 20),
             canvas: window.into_canvas().build().unwrap(),
         }
     }
@@ -51,19 +58,22 @@ impl<'a> Screen<'a> {
     }
 
     pub fn draw_health(&mut self, health: u32) {
+        let rect = self.top_left;
+        self.text_in_rect(&format!("health: {:?}", health), rect);
+    }
+
+    pub fn draw_level(&mut self, level: u32) {
+        let rect = self.top_right;
+        self.text_in_rect(&format!("Level: {:?}", level), rect);
+    }
+
+    fn text_in_rect(&mut self, text: &str, rect: Rect) {
         let texture_creator = self.canvas.texture_creator();
-        let surface = self
-            .font
-            .render(&format!("health: {:?}", health))
-            .blended(Color::RGB(255, 255, 0))
-            .unwrap();
+        let surface = self.font.render(text).blended(Self::TEXT_COL).unwrap();
         let texture = texture_creator
             .create_texture_from_surface(&surface)
             .unwrap();
-
-        self.canvas
-            .copy(&texture, None, Some(self.top_left))
-            .unwrap();
+        self.canvas.copy(&texture, None, Some(rect)).unwrap();
     }
 
     pub fn draw_big_centered(&mut self, text: &str) {
