@@ -1,4 +1,15 @@
-# Done so far
+
+# What is this?
+I'm learning game development by building a game of asteroids without an engine.
+I only use `sdl2` for IO purposes, everything else is coded myself (poorly).
+My architecture is mostly ECS, most functionality are in the methods of
+components while my `entity_manager` brings them together into systems.
+I plan on transitioning this to a bullet hell style game. For future projects,
+I'll probably learn to use an engine of some kind.
+
+# Progress
+
+## Done so far
 * Control system
 * Momentum system
 * Rendering outlines
@@ -15,16 +26,15 @@
 * Shrapnel System - breaking into asteroids and outlines
 * Sleep until instant of next frame (as opposed to for fixed duration)
 * Heads up display (at least for health)
-
-# TODO Now
+* Entity Manager
 * Level system
-* AI System -> other ships -> transition to bullet hell
 
-# TODO Far future
-* Refactor
-    * EntityManager (holds entity_map and component owner sets)
-    * Update systems to take specific parts of IO, rather than whole controller
-    * Spawn projectiles in `impl Projectile` rather than in entity
+## TODO Now
+* Targeting System
+* Opposing ship movement system
+
+## TODO Far future
+* Balancing
 * Mouse based aiming and absolute controls
 * Expandable ship (attaching other weapons)
 * save/load
