@@ -37,7 +37,7 @@ impl<'a> Screen<'a> {
     pub fn new(sdl_context: &Sdl, ttf_context: &'a Sdl2TtfContext, font_path: &str) -> Self {
         let video_subsystem = sdl_context.video().unwrap();
         let window = video_subsystem
-            .window("rust-sdl2 demo", Self::SCREEN_WIDTH, Self::SCREEN_HEIGHT)
+            .window("asteroids", Self::SCREEN_WIDTH, Self::SCREEN_HEIGHT)
             .position_centered()
             .build()
             .unwrap();

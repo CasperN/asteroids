@@ -7,8 +7,6 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::Sdl;
 
-extern crate rand;
-
 const TARGET_FPS: u64 = 60;
 
 enum Controls {
@@ -42,7 +40,6 @@ impl UserInput {
 
 pub struct UserInterface {
     pub user_input: UserInput,
-    pub rng: rand::rngs::ThreadRng,
     map: HashMap<Keycode, (Controls, bool)>,
     event_pump: sdl2::EventPump,
     next_frame: Instant,
@@ -74,7 +71,6 @@ impl UserInterface {
             map,
             user_input,
             event_pump,
-            rng: rand::thread_rng(),
             next_frame: Instant::now() + Duration::from_millis(1000 / TARGET_FPS),
         }
     }

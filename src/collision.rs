@@ -1,34 +1,34 @@
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
-use system::EMap;
+// use system::EMap;
 use vector_2d::V2;
 use X_LEN;
 use Y_LEN;
 
 const NUM_CELLS: usize = 8;
 
-pub fn find_collisions(outlines: &HashSet<usize>, entities: &EMap) -> Vec<(usize, usize)> {
-    let outlines: HashMap<usize, Vec<V2>> = outlines
-        .iter()
-        .flat_map(|id| {
-            let entity = entities.get(id);
-            entity
-                .and_then(|e| e.outline.as_ref())
-                .and_then(|o| {
-                    if let Some(m) = entity.and_then(|e| e.momentum.as_ref()) {
-                        return Some((*id, o.compute_outline(&m)));
-                    }
-                    None
-                })
-                .into_iter()
-        })
-        .collect();
+// pub fn find_collisions(outlines: &HashSet<usize>, entities: &EMap) -> Vec<(usize, usize)> {
+//     let outlines: HashMap<usize, Vec<V2>> = outlines
+//         .iter()
+//         .flat_map(|id| {
+//             let entity = entities.get(id);
+//             entity
+//                 .and_then(|e| e.outline.as_ref())
+//                 .and_then(|o| {
+//                     if let Some(m) = entity.and_then(|e| e.momentum.as_ref()) {
+//                         return Some((*id, o.compute_outline(&m)));
+//                     }
+//                     None
+//                 })
+//                 .into_iter()
+//         })
+//         .collect();
+//
+//     grid_search(&outlines)
+// }
 
-    grid_search(&outlines)
-}
-
-fn grid_search(outlines: &HashMap<usize, Vec<V2>>) -> Vec<(usize, usize)> {
+pub fn grid_search(outlines: &HashMap<usize, Vec<V2>>) -> Vec<(usize, usize)> {
     let mut grid = vec![HashSet::<usize>::new(); NUM_CELLS * NUM_CELLS];
 
     for (idx, o) in outlines.iter() {
