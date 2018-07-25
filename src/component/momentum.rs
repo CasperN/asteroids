@@ -78,9 +78,9 @@ impl Momentum {
             vel: V2(0.0, 0.0),
             omega: 0.0,
             mass: 10.0,
-            edge_behavior: Wall,
-            speed_decay: 0.5,
-            rotation_decay: 0.2,
+            edge_behavior: PacMan,
+            speed_decay: 0.6,
+            rotation_decay: 0.3,
         }
     }
 

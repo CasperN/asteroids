@@ -34,6 +34,7 @@ I'll probably learn to use an engine of some kind.
 * Opposing ship movement system
 
 ## TODO Far future
+* Time heap to stop polling
 * Balancing
 * Mouse based aiming and absolute controls
 * Expandable ship (attaching other weapons)

@@ -16,13 +16,9 @@ pub enum Projectile {
     },
 }
 impl Projectile {
-    pub fn spawn_entity<R: rand::Rng>(
-        &self,
-        rng: &mut R,
-        momentum: &Option<Box<Momentum>>,
-    ) -> Entity {
+    pub fn spawn_entity<R: rand::Rng>(&self, rng: &mut R, momentum: Option<&Momentum>) -> Entity {
         match self {
-            Bullet => new_bullet(momentum.as_ref().unwrap()),
+            Bullet => new_bullet(momentum.unwrap()),
             Asteroid {
                 speed_range,
                 mass_range,

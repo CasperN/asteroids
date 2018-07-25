@@ -126,9 +126,7 @@ impl EntityManager {
         let mut new_ents = Vec::new();
         for (id, s) in self.shooting.iter_mut() {
             if let Some(b) = s.try_fire() {
-                new_ents
-                    .push(b.spawn_entity(rng, &self.momentum.get(id).map(|m| Box::new(m.clone()))));
-                // TODO make clean
+                new_ents.push(b.spawn_entity(rng, self.momentum.get(id)));
             }
         }
         for e in new_ents.into_iter() {

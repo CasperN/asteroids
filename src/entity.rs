@@ -60,7 +60,7 @@ impl Entity {
             .add_momentum(Momentum::new_centered())
             .add_outline(Outline::new_ship())
             .add_shooting(Shooting::new_ship_gun())
-            .add_control(100.0, 250.0)
+            .add_control(200.0, 400.0)
             .add_health(10)
             .add_shrapnel(Shrapnel::Shards)
     }

@@ -19,7 +19,6 @@ impl Shrapnel {
         outline: &Outline,
         rng: &mut R,
     ) -> Vec<Entity> {
-        // CONSIDER IF THEY SPAWN OUTSIDE OF THE MAP
 
         let mut new_entities = Vec::new();
 
@@ -27,8 +26,7 @@ impl Shrapnel {
             Shrapnel::Shards => {
                 let points = outline.get_relative_outline();
                 let n = points.len();
-
-                for (i, _d) in roots_of_unity(n).iter().enumerate() {
+                for i in 0..n {
                     let a = points[i];
                     let b = points[(i + 1) % n];
                     let center = (a + b).scale(0.5);
@@ -49,14 +47,16 @@ impl Shrapnel {
                 }
             }
             Shrapnel::Asteroids => {
-                let n_chunks = rng.gen_range(2, 4);
-                let old_radius = momentum.mass.sqrt();
-                let chunk_radius = old_radius / n_chunks as f32;
-                let chunk_mass = chunk_radius * chunk_radius;
+                let n_chunks = rng.gen_range(2, 5);
+                // let old_radius = momentum.mass.sqrt();
+                // let chunk_radius = old_radius / n_chunks as f32;
+                // let chunk_mass = chunk_radius * chunk_radius;
+                let chunk_mass = momentum.mass * 0.75 / n_chunks as f32;
+                let chunk_radius = chunk_mass.sqrt();
 
                 for dir in roots_of_unity(n_chunks).into_iter() {
                     let mut m = momentum.clone();
-                    m.pos += dir.scale(chunk_radius * 1.1);
+                    m.pos += dir.scale(chunk_radius * 1.25);
                     m.vel += dir.scale(1.5);
                     m.omega += rng.gen_range(-PI, PI);
 
